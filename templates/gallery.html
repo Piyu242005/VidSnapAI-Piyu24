@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery - AI Reel Generator{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container gallery-container">
+    <h1 class="gallery-title">
+        <i class="fas fa-photo-video"></i> Reel Gallery
+    </h1>
+    <p class="gallery-subtitle">Browse your AI-generated video reels</p>
+    
+    {% if reels %}
+    <div class="gallery-stats">
+        <span class="stat-item">
+            <i class="fas fa-video"></i> {{ reels|length }} Reel{{ 's' if reels|length != 1 else '' }}
+        </span>
+    </div>
+    
+    <div class="gallery-grid">
+        {% for reel in reels %}
+        <div class="gallery-item">
+            <div class="reel-card">
+                <div class="video-wrapper">
+                    <video 
+                        class="reel-video" 
+                        src="{{ url_for('static', filename='reels/' + reel) }}" 
+                        controls 
+                        preload="metadata"
+                        poster=""
+                    >
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="reel-info">
+                    <h3 class="reel-title">
+                        <i class="fas fa-film"></i> {{ reel.rsplit('.', 1)[0][:30] }}{{ '...' if reel.rsplit('.', 1)[0]|length > 30 else '' }}
+                    </h3>
+                    <div class="reel-actions">
+                        <a href="{{ url_for('static', filename='reels/' + reel) }}" 
+                           download="{{ reel }}" 
+                           class="btn-download"
+                           title="Download">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        <button class="btn-fullscreen" 
+                                onclick="openFullscreen('{{ url_for('static', filename='reels/' + reel) }}')"
+                                title="View Fullscreen">
+                            <i class="fas fa-expand"></i> Fullscreen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-gallery">
+        <i class="fas fa-video-slash"></i>
+        <h2>No Reels Yet</h2>
+        <p>Start creating amazing reels with VidSnapAI!</p>
+        <a href="/create" class="btn-create">
+            <i class="fas fa-plus-circle"></i> Create Your First Reel
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Fullscreen Modal -->
+<div id="fullscreenModal" class="modal-fullscreen" onclick="closeFullscreen()">
+    <span class="close-modal">&times;</span>
+    <video id="fullscreenVideo" controls autoplay>
+        Your browser does not support the video tag.
+    </video>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openFullscreen(videoSrc) {
+    const modal = document.getElementById('fullscreenModal');
+    const video = document.getElementById('fullscreenVideo');
+    video.src = videoSrc;
+    modal.style.display = 'flex';
+    video.play();
+}
+
+function closeFullscreen() {
+    const modal = document.getElementById('fullscreenModal');
+    const video = document.getElementById('fullscreenVideo');
+    modal.style.display = 'none';
+    video.pause();
+    video.src = '';
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeFullscreen();
+    }
+});
+</script>
+{% endblock %}

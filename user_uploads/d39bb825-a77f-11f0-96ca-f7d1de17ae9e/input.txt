@@ -1,0 +1,4 @@
+file 'C:/Users/piyu1/OneDrive/Desktop/Python Piyu/VidSnapAI PROJECT/7_ VidSnapAI - Displaying the Generated Reels in Gallery/user_uploads/d39bb825-a77f-11f0-96ca-f7d1de17ae9e/assetsprofile.jpg'
+duration 1
+file 'C:/Users/piyu1/OneDrive/Desktop/Python Piyu/VidSnapAI PROJECT/7_ VidSnapAI - Displaying the Generated Reels in Gallery/user_uploads/d39bb825-a77f-11f0-96ca-f7d1de17ae9e/piyu000.jpg'
+duration 1
