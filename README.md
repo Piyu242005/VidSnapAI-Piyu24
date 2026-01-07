@@ -6,6 +6,18 @@ Recent updates include a modernized UI with a **theme toggle system** (Red/Black
 
 ![Project Preview](static/Piyu24.jpg)
 
+## 📸 Website Screenshots
+
+| Page | Preview |
+|------|--------|
+| Homepage | ![Homepage](Screenshot%20Website/Homepage.jpeg) |
+| About | ![About](Screenshot%20Website/About.jpeg) |
+| Features | ![Features](Screenshot%20Website/Features.jpeg) |
+| Reel Gallery | ![Reel Gallery](Screenshot%20Website/Reel%20Gallery.jpeg) |
+| Reel Created | ![Reel Created](Screenshot%20Website/Reel%20created.jpeg) |
+
+
+
 ## 🚀 Key Features
 
 - **AI Voice Synthesis**: Integrated with ElevenLabs API for realistic voiceovers.
