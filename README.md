@@ -1,129 +1,100 @@
-# VidSnapAI - AI-Powered TikTok/Reel Generator
+# VidSnapAI - AI-Powered Video Reel Generator
 
-VidSnapAI is an automated short-form video generation system that combines AI voice synthesis with programmatic video editing to create engaging TikTok and Instagram Reels content. This project was developed as part of a Bachelor's degree in Computer Applications at G H Raisoni University, Amravati.
+VidSnapAI is an advanced web application that automates the creation of short-form video content (Reels/TikToks). By combining AI-powered voice synthesis (ElevenLabs) covering FFmpeg for video processing, it transforms simple text scripts into professional-quality video reels.
 
-## Overview
+Recent updates include a modernized UI with a **theme toggle system** (Red/Black Dark Mode & Warm Beige Light Mode), a redesigned **About** page featuring pixel-perfect team cards, and significant code cleanup.
 
-VidSnapAI streamlines content creation by:
-- Converting text scripts into professional short-form videos
-- Generating natural-sounding voiceovers using ElevenLabs AI
-- Automating video assembly and editing via FFmpeg
-- Providing a user-friendly web interface built with Flask
+![Project Preview](static/Piyu24.jpg)
 
-## Features
+## 🚀 Key Features
 
-- **AI Voice Generation**: Utilizes ElevenLabs' text-to-speech technology for high-quality narration
-- **Automated Video Processing**: FFmpeg-powered media processing pipeline
-- **Web Interface**: Simple Flask-based UI for content input and video retrieval
-- **Platform Optimized**: Outputs vertical format videos optimized for TikTok/Reels
-- **Quick Turnaround**: Reduces manual editing time through automation
+- **AI Voice Synthesis**: Integrated with ElevenLabs API for realistic voiceovers.
+- **Automated Video Editing**: Programmatic video assembly using FFmpeg (transitions, overlays, audio mixing).
+- **Theme Toggle System**:
+    - **Dark Mode**: Signature Red & Black aesthetic.
+    - **Light Mode**: New Warm Beige theme (`#fdfcfb` → `#e2d1c3`).
+    - *Persists user preference via LocalStorage.*
+- **Modern UI/UX**:
+    - Responsive design with glassmorphism effects.
+    - Revamped **About** page with a high-fidelity "Meet our team" section.
+    - Interactive "Create Reel" workflow.
+- **Platform Optimized**: Outputs vertical 9:16 video format perfect for social media.
 
-## System Requirements
+## 📂 Project Structure
 
-### Software
-- Python 3.x
-- Flask web framework
-- FFmpeg (version 4.0 or later)
-- ElevenLabs API key
-- Required Python packages (see requirements.txt)
-
-### Hardware
-- Multi-core CPU (quad-core or better recommended)
-- Minimum 8GB RAM
-- Internet connection for API access
-- Compatible with Windows, Linux, or macOS
-
-## Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/VidSnapAI.git
-cd VidSnapAI
+```
+VidSnapAI-Piyu24/
+├── main.py                 # Core Flask application entry point
+├── generate_process.py     # Video generation logic (FFmpeg + Audio mixing)
+├── text_to_audio.py        # ElevenLabs text-to-speech integration
+├── config.py               # Configuration settings
+├── requirements.txt        # Project dependencies
+├── static/                 # Static assets
+│   ├── css/                # Stylesheets (style.css, about.css, etc.)
+│   ├── js/                 # JavaScript (theme.js, notifications.js)
+│   ├── fonts/              # Local fonts
+│   └── ...                 # Uploaded/Generated media placeholders
+├── templates/              # HTML Templates (Jinja2)
+│   ├── base.html           # Base layout with Navbar/Footer
+│   ├── index.html          # Homepage
+│   ├── create.html         # Video creation form
+│   ├── about.html          # Team & Mission page
+│   └── ...
+└── user_uploads/           # Directory for user-uploaded content
 ```
 
-2. Create and activate virtual environment
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+## 🛠️ Installation & Setup
 
-3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+### Prerequisites
+- Python 3.8+
+- [FFmpeg](https://ffmpeg.org/download.html) installed and added to system PATH.
+- An [ElevenLabs API Key](https://elevenlabs.io/).
 
-4. Install FFmpeg
-- Follow instructions at [ffmpeg.org](https://ffmpeg.org) for your operating system
+### Steps
 
-5. Configure environment variables
-```bash
-export ELEVENLABS_API_KEY='your_api_key_here'
-# On Windows: set ELEVENLABS_API_KEY=your_api_key_here
-```
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/VidSnapAI.git
+   cd VidSnapAI
+   ```
 
-## Usage
+2. **Create Virtual Environment**
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
+   ```
 
-1. Start the Flask server
-```bash
-flask run
-```
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-2. Open your web browser and navigate to `http://localhost:5000`
+4. **Environment Configuration**
+   - Ensure FFmpeg is accessible.
+   - Set up your ElevenLabs API key in the application or environment variables.
 
-3. Enter your script or content in the web interface
+5. **Run the Application**
+   ```bash
+   python main.py
+   ```
+   Access the app at `http://localhost:5000`.
 
-4. Wait for processing to complete
+## 🎨 UI & Theming
 
-5. Download your generated video
+The application now supports dynamic theming:
+- **Toggle** the theme using the icon in the navbar.
+- **Dark Mode**: Deep blacks with vibrant red accents (`#ff0000`).
+- **Light Mode**: Soft warm beige gradients (`#fdfcfb` to `#e2d1c3`) with dark brown text.
 
-## System Architecture
+## 👥 Team
 
-The system consists of three main components:
+**Piyush Ramteke**  
+*Data Scientist & Full Stack Developer*  
+Focused on scalable web applications and AI-driven solutions.
 
-1. **Web Interface (Flask)**
-   - Handles user input
-   - Manages file uploads
-   - Delivers processed videos
+## 📄 License
 
-2. **Voice Synthesis (ElevenLabs)**
-   - Converts text to natural-sounding speech
-   - Generates audio narration
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-3. **Video Processing (FFmpeg)**
-   - Combines audio and visual elements
-   - Applies transitions and effects
-   - Ensures proper output format
-
-## Future Improvements
-
-- Multiple language support
-- Expanded video template library
-- Performance optimization
-- Advanced editing features
-- Platform integration options
-
-## Technical Documentation
-
-For detailed technical information, please refer to the following resources:
-- [ElevenLabs Documentation](https://elevenlabs.io)
-- [FFmpeg Documentation](https://ffmpeg.org)
-- [Flask Documentation](https://flask.palletsprojects.com/)
-
-## Academic Context
-
-This project was developed by Piyush Ramteke
-
-## License
-
-[Specify your chosen license]
-
-## Contact
-
-Piyush Ramteke  
-piyu.143247@gmail.com
-
-## Acknowledgments
-
-- Mr.Piyush Ramteke (Project Guide)
-- ElevenLabs for AI voice technology
-- FFmpeg community for multimedia tools
+---
+Developed by **Piyush Ramteke**
