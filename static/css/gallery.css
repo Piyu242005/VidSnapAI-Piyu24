@@ -9,19 +9,21 @@
 .gallery-title {
     text-align: center;
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--text-light);
     font-weight: 700;
     font-size: 2.5rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .gallery-title i {
-    color: #f27a7d;
+    color: #ff0000;
     margin-right: 0.5rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .gallery-subtitle {
     text-align: center;
-    color: #555;
+    color: var(--text-gray);
     font-size: 1.1rem;
     margin-bottom: 2rem;
 }
@@ -34,12 +36,13 @@
 
 .stat-item {
     display: inline-block;
-    background: linear-gradient(135deg, #f7d486 0%, #f5c563 100%);
-    color: #333;
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
+    color: var(--text-light);
     padding: 0.75rem 1.5rem;
     border-radius: 25px;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(247, 212, 134, 0.4);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+    border: 1px solid rgba(255, 0, 0, 0.3);
 }
 
 .stat-item i {
@@ -64,17 +67,19 @@
 
 /* Reel Card */
 .reel-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(247, 212, 134, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 0, 0, 0.3);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(255, 0, 0, 0.2);
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
 .reel-card:hover {
-    box-shadow: 0 8px 30px rgba(242, 122, 125, 0.3);
-    border-color: rgba(242, 122, 125, 0.5);
+    box-shadow: 0 8px 30px rgba(255, 0, 0, 0.4);
+    border-color: rgba(255, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
 }
 
 /* Video Wrapper */
@@ -95,13 +100,13 @@
 /* Reel Info */
 .reel-info {
     padding: 1.25rem;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .reel-title {
     margin: 0 0 1rem 0;
     font-size: 1.1rem;
-    color: #2c3e50;
+    color: var(--text-light);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -109,8 +114,9 @@
 }
 
 .reel-title i {
-    color: #f27a7d;
+    color: #ff0000;
     font-size: 1rem;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
 }
 
 /* Reel Actions */
@@ -138,44 +144,47 @@
 }
 
 .btn-download {
-    background: linear-gradient(135deg, #f27a7d 0%, #e74c3c 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
     color: white;
+    border: 1px solid rgba(255, 0, 0, 0.3);
 }
 
 .btn-download:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(242, 122, 125, 0.6);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.6);
     color: white;
+    border-color: #ff0000;
 }
 
 .btn-fullscreen {
-    background: rgba(247, 212, 134, 0.2);
-    color: #f7d486;
-    border: 2px solid rgba(247, 212, 134, 0.5);
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff0000;
+    border: 2px solid rgba(255, 0, 0, 0.3);
 }
 
 .btn-fullscreen:hover {
-    background: rgba(247, 212, 134, 0.3);
-    border-color: #f7d486;
+    background: rgba(255, 0, 0, 0.2);
+    border-color: #ff0000;
     transform: translateY(-2px);
-    color: #f5c563;
+    color: #ff0000;
 }
 
 /* Empty Gallery State */
 .empty-gallery {
     text-align: center;
     padding: 4rem 2rem;
-    color: #555;
+    color: var(--text-gray);
 }
 
 .empty-gallery i {
     font-size: 5rem;
-    color: #f7d486;
+    color: #ff0000;
     margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .empty-gallery h2 {
-    color: #2c3e50;
+    color: var(--text-light);
     margin-bottom: 1rem;
     font-weight: 600;
 }
@@ -188,19 +197,21 @@
 .btn-create {
     display: inline-block;
     padding: 1rem 2rem;
-    background: linear-gradient(135deg, #f27a7d 0%, #e74c3c 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
     color: white;
     text-decoration: none;
     border-radius: 30px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(242, 122, 125, 0.4);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+    border: 2px solid rgba(255, 0, 0, 0.3);
 }
 
 .btn-create:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(242, 122, 125, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
     color: white;
+    border-color: #ff0000;
 }
 
 .btn-create i {
@@ -240,7 +251,388 @@
 }
 
 .close-modal:hover {
-    color: #f27a7d;
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+/* Gallery Controls */
+.gallery-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    color: var(--text-gray);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.filter-btn:hover {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.1);
+}
+
+.filter-btn.active {
+    background: #ff0000;
+    color: white;
+    border-color: #ff0000;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sort-controls label {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.sort-controls select {
+    padding: 0.5rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--text-light);
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.1);
+}
+
+.view-btn.active {
+    background: #ff0000;
+    color: white;
+    border-color: #ff0000;
+}
+
+/* Enhanced Reel Cards */
+.reel-thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9/16;
+    background: #000;
+    overflow: hidden;
+}
+
+.reel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.reel-card:hover .reel-overlay {
+    opacity: 1;
+}
+
+.btn-play {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #ff0000;
+    transition: all 0.3s ease;
+}
+
+.btn-play:hover {
+    transform: scale(1.1);
+    background: white;
+}
+
+.reel-stats-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    gap: 1rem;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.reel-stats-overlay span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.reel-date {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.reel-date i {
+    color: #ff0000;
+}
+
+.reel-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-share,
+.btn-delete {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-share {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff0000;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.btn-share:hover {
+    background: rgba(255, 0, 0, 0.2);
+}
+
+.btn-delete {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    padding: 0.5rem;
+}
+
+.btn-delete:hover {
+    background: rgba(220, 53, 69, 0.2);
+}
+
+/* Share Modal */
+.modal-share {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    align-items: center;
+    justify-content: center;
+}
+
+.share-content {
+    background: rgba(0, 0, 0, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    color: var(--text-light);
+}
+
+.close-share {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-share:hover {
+    color: #ff0000;
+}
+
+.share-content h3 {
+    color: #ff0000;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.share-url {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.share-url input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
+}
+
+.btn-copy {
+    padding: 0.75rem 1.5rem;
+    background: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-copy:hover {
+    background: #cc0000;
+}
+
+.social-share {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-btn {
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.social-btn.instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-btn.tiktok {
+    background: #000000;
+}
+
+.social-btn.youtube {
+    background: #ff0000;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.qr-code-container {
+    text-align: center;
+    padding: 1rem;
+}
+
+.qr-code-container img {
+    max-width: 200px;
+    border: 2px solid rgba(255, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* List View */
+.gallery-list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.gallery-list-view .gallery-item {
+    width: 100%;
+}
+
+.gallery-list-view .reel-card {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.gallery-list-view .video-wrapper {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.gallery-list-view .reel-info {
+    flex: 1;
 }
 
 /* Responsive adjustments */
@@ -262,6 +654,26 @@
         right: 20px;
         font-size: 35px;
     }
+    
+    .gallery-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box,
+    .filter-buttons,
+    .sort-controls,
+    .view-toggle {
+        width: 100%;
+    }
+    
+    .filter-buttons {
+        justify-content: center;
+    }
+    
+    .view-toggle {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -279,7 +691,16 @@
     }
     
     .btn-download,
-    .btn-fullscreen {
+    .btn-fullscreen,
+    .btn-share {
+        width: 100%;
+    }
+    
+    .gallery-list-view .reel-card {
+        flex-direction: column;
+    }
+    
+    .gallery-list-view .video-wrapper {
         width: 100%;
     }
 }

@@ -1,11 +1,67 @@
 :root {
-    --primary-color: #000000;
-    --secondary-color: #ff0000;
+    /* Default Dark Theme */
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: rgba(0, 0, 0, 0.7);
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
     --accent-color: #ff0000;
-    --gradient-dark: linear-gradient(135deg, #000000 0%, #1a0000 50%, #ff0000 100%);
-    --gradient-light: linear-gradient(135deg, #000000 0%, #330000 50%, #ff0000 100%);
-    --content-gradient: linear-gradient(135deg, #c5f9d7 0%, #f7d486 50%, #f27a7d 100%);
+    --accent-gradient: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
+    --navbar-bg: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
+    --border-color: rgba(255, 0, 0, 0.3);
+    --shadow-color: rgba(255, 0, 0, 0.3);
+
+    /* Legacy variables mapping */
+    --primary-color: var(--bg-primary);
+    --secondary-color: var(--accent-color);
+    --gradient-dark: var(--navbar-bg);
+    --content-gradient: var(--accent-gradient);
+    --text-light: var(--text-primary);
+    --text-gray: var(--text-secondary);
 }
+
+[data-theme="light"] {
+    /* Light Theme - White & Purple */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f4f6;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --accent-color: #8b5cf6;
+    /* Purple for light mode */
+    --accent-gradient: linear-gradient(135deg, #ffffff 0%, #f3f4f6 50%, #8b5cf6 100%);
+    --navbar-bg: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    /* Solid purple gradient for navbar */
+    --border-color: rgba(139, 92, 246, 0.2);
+    --shadow-color: rgba(139, 92, 246, 0.2);
+
+    /* Override legacy mappings for light mode */
+    --gradient-dark: var(--navbar-bg);
+    --content-gradient: linear-gradient(to bottom, #ffffff, #f3f4f6);
+}
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar Theme Transition */
+.navbar {
+    background: var(--navbar-bg) !important;
+    transition: background 0.3s ease;
+}
+
+.navbar-brand,
+.nav-link {
+    transition: color 0.3s ease;
+}
+
+/* Common Element Theme usage */
+.footer {
+    background: var(--navbar-bg);
+}
+
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,6 +69,7 @@ body {
     display: flex;
     flex-direction: column;
     background: var(--content-gradient);
+    color: var(--text-light);
 }
 
 /* Navbar Styles */
@@ -72,7 +129,7 @@ footer {
 /* Hero Section Styles */
 .hero-section {
     background: transparent;
-    color: #2c3e50;
+    color: var(--text-light);
     padding: 6rem 0;
     text-align: center;
     position: relative;
@@ -86,7 +143,7 @@ footer {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(247, 212, 134, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.2) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -94,10 +151,14 @@ footer {
     font-size: 3.5rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
     position: relative;
     z-index: 1;
-    color: #2c3e50;
+    color: var(--text-light);
+    background: linear-gradient(135deg, #ffffff 0%, #ff0000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-subtitle {
@@ -106,11 +167,11 @@ footer {
     opacity: 0.9;
     position: relative;
     z-index: 1;
-    color: #34495e;
+    color: var(--text-gray);
 }
 
 .cta-button {
-    background: linear-gradient(135deg, #f27a7d 0%, #e74c3c 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
     color: white;
     padding: 1rem 2rem;
     border-radius: 50px;
@@ -118,15 +179,17 @@ footer {
     text-decoration: none;
     transition: all 0.3s ease;
     display: inline-block;
-    box-shadow: 0 4px 15px rgba(242, 122, 125, 0.4);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
     position: relative;
     z-index: 1;
+    border: 2px solid rgba(255, 0, 0, 0.3);
 }
 
 .cta-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(242, 122, 125, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
     color: white;
+    border-color: #ff0000;
 }
 
 /* Features Section Styles */
@@ -139,27 +202,31 @@ footer {
     text-align: center;
     padding: 2rem;
     border-radius: 15px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(247, 212, 134, 0.5);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
     transition: all 0.3s ease;
-    color: #2c3e50;
+    color: var(--text-light);
+    backdrop-filter: blur(10px);
 }
 
 .feature-card:hover {
     transform: translateY(-10px);
-    border-color: rgba(242, 122, 125, 0.5);
-    box-shadow: 0 8px 25px rgba(242, 122, 125, 0.3);
+    border-color: rgba(255, 0, 0, 0.6);
+    box-shadow: 0 8px 25px rgba(255, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.8);
 }
 
 .feature-card h3 {
-    color: #f27a7d;
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .feature-icon {
     font-size: 2.5rem;
-    color: #f7d486;
+    color: #ff0000;
     margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 /* Showcase Section Styles */
@@ -171,7 +238,8 @@ footer {
 .showcase-title {
     text-align: center;
     margin-bottom: 3rem;
-    color: #2c3e50;
+    color: var(--text-light);
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .image-grid {
@@ -198,8 +266,8 @@ footer {
     .hero-title {
         font-size: 2.5rem;
     }
-    
+
     .hero-subtitle {
         font-size: 1.2rem;
     }
-} 
+}

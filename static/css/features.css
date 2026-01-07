@@ -1,0 +1,351 @@
+.features-page {
+    padding: 4rem 0;
+    min-height: 70vh;
+    background: transparent;
+}
+
+.features-hero {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 2rem 0;
+}
+
+.features-title {
+    font-size: 3rem;
+    color: #ff0000;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+.features-subtitle {
+    font-size: 1.5rem;
+    color: var(--text-gray);
+}
+
+.feature-category {
+    margin-bottom: 5rem;
+}
+
+.category-title {
+    font-size: 2.5rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.category-title i {
+    color: #ff0000;
+}
+
+.category-description {
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    backdrop-filter: blur(10px);
+    color: var(--text-light);
+}
+
+.feature-card.fade-in-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.5s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(255, 0, 0, 0.2);
+    border-color: #ff0000;
+}
+
+.feature-card.featured {
+    border: 2px solid #ff0000;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(255, 0, 0, 0.1) 100%);
+}
+
+.feature-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff0000;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: #ff0000;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.feature-card h3 {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.feature-card p {
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.feature-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-details li {
+    padding: 0.5rem 0;
+    color: var(--text-gray);
+    padding-left: 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+}
+
+.feature-details li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #ff0000;
+    font-weight: bold;
+}
+
+/* Quick Wins Section */
+.quick-wins-section {
+    margin-bottom: 5rem;
+    padding: 3rem 2rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.quick-wins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.quick-win-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 0, 0, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.quick-win-item:hover {
+    background: rgba(255, 0, 0, 0.1);
+    transform: translateY(-3px);
+    border-color: #ff0000;
+}
+
+.quick-win-item i {
+    font-size: 2rem;
+    color: #ff0000;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.quick-win-item h4 {
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.quick-win-item p {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Comparison Section */
+.comparison-section {
+    margin-bottom: 5rem;
+    padding: 3rem 2rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.comparison-table {
+    overflow-x: auto;
+    margin-top: 2rem;
+}
+
+.comparison-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.comparison-table th {
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.comparison-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 0, 0, 0.1);
+    color: var(--text-light);
+}
+
+.comparison-table tr:hover {
+    background: rgba(255, 0, 0, 0.05);
+}
+
+.comparison-table .text-success {
+    color: #28a745;
+    font-size: 1.2rem;
+}
+
+.comparison-table .text-danger {
+    color: #dc3545;
+    font-size: 1.2rem;
+}
+
+/* CTA Section */
+.features-cta {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(255, 0, 0, 0.9) 100%);
+    border-radius: 15px;
+    color: white;
+    margin-top: 4rem;
+}
+
+.features-cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.features-cta p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-button-large {
+    display: inline-block;
+    padding: 1.25rem 3rem;
+    background: white;
+    color: #ff0000;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    color: #ff0000;
+}
+
+.cta-button-large i {
+    margin-right: 0.5rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-visible {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .features-title {
+        font-size: 2rem;
+    }
+    
+    .features-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .category-title {
+        font-size: 2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-wins-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    
+    .comparison-table {
+        font-size: 0.9rem;
+    }
+    
+    .features-cta h2 {
+        font-size: 2rem;
+    }
+    
+    .cta-button-large {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .feature-card {
+        padding: 1.5rem;
+    }
+    
+    .quick-wins-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-table table {
+        min-width: 100%;
+    }
+}
+

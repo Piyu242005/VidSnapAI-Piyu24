@@ -11,10 +11,10 @@ client = ElevenLabs(
 )
 
 
-def text_to_speech_file(text: str, folder: str) -> str:
+def text_to_speech_file(text: str, folder: str, voice_id: str = "pNInz6obpgDQGcFmaJgB", speed: float = 1.0) -> str:
     # Calling the text_to_speech conversion API with detailed parameters
     response = client.text_to_speech.convert(
-        voice_id="pNInz6obpgDQGcFmaJgB", # Adam pre-made voice
+        voice_id=voice_id,
         output_format="mp3_22050_32",
         text=text,
         model_id="eleven_turbo_v2_5", # use the turbo model for low latency
@@ -24,7 +24,7 @@ def text_to_speech_file(text: str, folder: str) -> str:
             similarity_boost=1.0,
             style=0.0,
             use_speaker_boost=True,
-            speed=1.0,
+            speed=speed,
         ),
     )
 

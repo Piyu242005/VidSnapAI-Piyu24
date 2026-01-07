@@ -10,28 +10,31 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(247, 212, 134, 0.5);
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid rgba(255, 0, 0, 0.3);
     border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 25px rgba(255, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    color: var(--text-light);
 }
 
 .upload-title {
     text-align: center;
     margin-bottom: 2rem;
-    color: #f27a7d;
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .upload-instructions {
     text-align: center;
     margin-bottom: 2rem;
-    color: #555;
+    color: var(--text-gray);
 }
 
 .dropzone {
-    border: 2px dashed #f7d486 !important;
+    border: 2px dashed rgba(255, 0, 0, 0.3) !important;
     border-radius: 10px !important;
-    background: rgba(247, 212, 134, 0.1) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
     min-height: 200px !important;
     padding: 20px !important;
     cursor: pointer !important;
@@ -39,26 +42,27 @@
 
 .dropzone .dz-message {
     margin: 2em 0 !important;
-    color: #f27a7d !important;
+    color: #ff0000 !important;
     font-size: 1.2rem !important;
 }
 
 .submit-btn {
-    background: linear-gradient(135deg, #f27a7d 0%, #e74c3c 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
     color: white;
     padding: 1rem 2rem;
-    border: none;
+    border: 2px solid rgba(255, 0, 0, 0.3);
     border-radius: 50px;
     font-weight: bold;
     margin-top: 2rem;
     width: 100%;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(242, 122, 125, 0.4);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
 }
 
 .submit-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(242, 122, 125, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
+    border-color: #ff0000;
 }
 
 .submit-btn:disabled {
@@ -74,11 +78,11 @@
 .text-input {
     width: 100%;
     padding: 1rem;
-    border: 2px solid rgba(247, 212, 134, 0.5);
+    border: 2px solid rgba(255, 0, 0, 0.3);
     border-radius: 10px;
-    background-color: #fff;
+    background-color: rgba(0, 0, 0, 0.5);
     font-size: 1rem;
-    color: #333;
+    color: var(--text-light);
     resize: vertical;
     min-height: 100px;
     transition: all 0.3s ease;
@@ -86,17 +90,18 @@
 }
 
 .text-input:hover {
-    border-color: #f7d486;
+    border-color: rgba(255, 0, 0, 0.5);
 }
 
 .text-input:focus {
     outline: none;
-    border-color: #f27a7d;
-    box-shadow: 0 0 0 3px rgba(242, 122, 125, 0.2);
+    border-color: #ff0000;
+    box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 .text-input::placeholder {
-    color: #999;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .file-input-group {
@@ -109,34 +114,35 @@
 .file-input {
     flex: 1;
     padding: 8px;
-    border: 1px solid rgba(247, 212, 134, 0.5);
+    border: 1px solid rgba(255, 0, 0, 0.3);
     border-radius: 4px;
-    background-color: #fff;
-    color: #333;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
 }
 
 .add-file-btn {
-    background: linear-gradient(135deg, #f7d486 0%, #f5c563 100%);
-    color: #333;
-    border: none;
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 0, 0, 0.3);
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
     margin: 10px 0;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(247, 212, 134, 0.3);
+    box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
 }
 
 .add-file-btn:hover {
-    box-shadow: 0 4px 15px rgba(247, 212, 134, 0.5);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
     transform: translateY(-2px);
+    border-color: #ff0000;
 }
 
 .remove-file-btn {
-    background: linear-gradient(135deg, #f27a7d 0%, #e74c3c 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
     color: white;
-    border: none;
+    border: 1px solid rgba(255, 0, 0, 0.3);
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -150,7 +156,8 @@
 
 .remove-file-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(242, 122, 125, 0.5);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    border-color: #ff0000;
 }
 
 #fileInputs {
@@ -159,7 +166,7 @@
 
 /* Style for the file input when a file is selected */
 .file-input:not(:placeholder-shown) {
-    border-color: #f27a7d;
+    border-color: #ff0000;
 }
 
 /* Success Modal Styles */
@@ -183,14 +190,15 @@
 }
 
 .success-content {
-    background: rgba(255, 255, 255, 0.98);
+    background: rgba(0, 0, 0, 0.95);
     padding: 3rem;
     border-radius: 20px;
     text-align: center;
     max-width: 500px;
-    border: 2px solid rgba(247, 212, 134, 0.5);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 0, 0, 0.5);
+    box-shadow: 0 10px 40px rgba(255, 0, 0, 0.3);
     animation: slideUp 0.4s ease;
+    color: var(--text-light);
 }
 
 @keyframes slideUp {
@@ -200,9 +208,10 @@
 
 .success-icon {
     font-size: 5rem;
-    color: #c5f9d7;
+    color: #ff0000;
     margin-bottom: 1.5rem;
     animation: scaleIn 0.5s ease;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
 }
 
 @keyframes scaleIn {
@@ -211,13 +220,14 @@
 }
 
 .success-content h2 {
-    color: #f27a7d;
+    color: #ff0000;
     margin-bottom: 1rem;
     font-size: 2rem;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
 .success-content p {
-    color: #555;
+    color: var(--text-gray);
     margin-bottom: 2rem;
     font-size: 1.1rem;
 }
@@ -245,57 +255,493 @@
 }
 
 .btn-view-gallery {
-    background: linear-gradient(135deg, #f27a7d 0%, #e74c3c 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 50%, #ff0000 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(242, 122, 125, 0.4);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+    border: 2px solid rgba(255, 0, 0, 0.3);
 }
 
 .btn-view-gallery:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(242, 122, 125, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
     color: white;
+    border-color: #ff0000;
 }
 
 .btn-view-reel {
     background: transparent;
-    color: #f27a7d;
-    border: 2px solid #f27a7d;
+    color: #ff0000;
+    border: 2px solid #ff0000;
 }
 
 .btn-view-reel:hover {
-    background: rgba(242, 122, 125, 0.1);
+    background: rgba(255, 0, 0, 0.1);
     transform: translateY(-3px);
-    color: #f27a7d;
+    color: #ff0000;
+    border-color: #ff0000;
 }
 
 .btn-create-another {
     background: transparent;
-    color: #555;
-    border: 2px solid #ddd;
+    color: var(--text-gray);
+    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-create-another:hover {
-    background: rgba(247, 212, 134, 0.1);
-    border-color: #f7d486;
+    background: rgba(255, 0, 0, 0.1);
+    border-color: rgba(255, 0, 0, 0.5);
+    color: var(--text-light);
 }
 
 /* Error Alert Styles */
 .error-alert {
-    background: rgba(242, 122, 125, 0.1);
-    border: 2px solid #f27a7d;
-    color: #721c24;
+    background: rgba(255, 0, 0, 0.1);
+    border: 2px solid #ff0000;
+    color: var(--text-light);
     padding: 1.5rem;
     border-radius: 10px;
     margin-bottom: 2rem;
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 4px 15px rgba(242, 122, 125, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
 }
 
 .error-alert i {
     font-size: 2rem;
-    color: #f27a7d;
+    color: #ff0000;
+}
+
+/* Upload Zone Styles */
+.upload-zone {
+    border: 3px dashed rgba(255, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    color: var(--text-light);
+}
+
+.upload-zone:hover {
+    border-color: rgba(255, 0, 0, 0.5);
+    background: rgba(255, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.upload-zone.drag-over {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.15);
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 4rem;
+    color: #ff0000;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.upload-text {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.upload-hint {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+/* Image Preview Grid */
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preview-card {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: move;
+}
+
+.preview-card:hover {
+    border-color: #ff0000;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+    transform: translateY(-3px);
+}
+
+.preview-card.dragging {
+    opacity: 0.5;
+}
+
+.preview-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background: #f5f5f5;
+}
+
+.preview-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: rgba(255, 0, 0, 0.9);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.preview-controls {
+    padding: 0.75rem;
+}
+
+.duration-control {
+    margin-bottom: 0.5rem;
+}
+
+.duration-control label {
+    font-size: 0.85rem;
+    color: #666;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.duration-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-move-up,
+.btn-move-down,
+.btn-remove {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    color: #ff0000;
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-move-up:hover,
+.btn-move-down:hover {
+    background: rgba(255, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-remove:hover {
+    background: #ff0000;
+    color: white;
+}
+
+/* Input Label */
+.input-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.input-label i {
+    color: #ff0000;
+}
+
+/* Input Footer */
+.input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.char-counter,
+.word-count {
+    color: var(--text-gray);
+}
+
+.btn-preview-audio {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    color: #ff0000;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-preview-audio:hover {
+    background: rgba(255, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Voice Selection */
+.voice-selection-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.voice-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.voice-dropdown {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.75rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+.speed-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.speed-control label {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.speed-control input[type="range"] {
+    width: 100px;
+}
+
+#speedValue {
+    font-weight: 600;
+    color: #ff0000;
+    min-width: 40px;
+}
+
+/* Advanced Options */
+.advanced-options {
+    margin: 2rem 0;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.toggle-advanced {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.toggle-advanced:hover {
+    background: rgba(255, 0, 0, 0.15);
+}
+
+.toggle-advanced i:first-child {
+    margin-right: 0.5rem;
+    color: #ff0000;
+}
+
+.advanced-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.advanced-content.show {
+    max-height: 2000px;
+}
+
+.option-group {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 0, 0, 0.1);
+}
+
+.option-group:last-child {
+    border-bottom: none;
+}
+
+/* Music Selection */
+.music-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.music-dropdown {
+    padding: 0.75rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.music-controls label {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.music-controls input[type="range"] {
+    flex: 1;
+    max-width: 200px;
+}
+
+#volumeValue {
+    font-weight: 600;
+    color: #ff0000;
+    min-width: 50px;
+}
+
+.music-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.music-upload label {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.music-upload input[type="file"] {
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+/* Overlay Controls */
+.overlay-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.overlay-controls input[type="text"] {
+    padding: 0.75rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.overlay-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.overlay-options select,
+.overlay-options input[type="color"],
+.overlay-options input[type="number"] {
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.overlay-options input[type="color"] {
+    width: 50px;
+    height: 38px;
+    cursor: pointer;
+}
+
+.overlay-options input[type="number"] {
+    width: 80px;
+}
+
+/* Video Settings */
+.video-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.setting-item label {
+    min-width: 120px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.setting-item select {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+    color: var(--text-light);
+    cursor: pointer;
 }
 
 /* Responsive adjustments */
@@ -312,5 +758,40 @@
     .success-content {
         margin: 1rem;
         padding: 2rem;
+    }
+    
+    .image-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .voice-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .speed-control {
+        width: 100%;
+    }
+    
+    .speed-control input[type="range"] {
+        flex: 1;
+    }
+    
+    .overlay-options {
+        flex-direction: column;
+    }
+    
+    .overlay-options select,
+    .overlay-options input {
+        width: 100%;
+    }
+    
+    .setting-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .setting-item label {
+        min-width: auto;
     }
 }

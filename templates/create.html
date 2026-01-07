@@ -40,26 +40,156 @@
         {% endif %}
         <div class="upload-container">
             <h1 class="upload-title">Create Your Reel</h1>
-            <p class="upload-instructions">Upload your video files to create an amazing reel. You can upload multiple files.</p>
+            <p class="upload-instructions">Drag & drop images or click to browse. Upload multiple images to create an amazing reel.</p>
             
-            <form action="/create" enctype="multipart/form-data" method="post" class="dropzone" id="myDropzone" >
-                <div class="fallback">
-                    <div id="fileInputs">
-                        <div class="file-input-group">
-                            <input name="file1" type="file" class="file-input" />
-                            <input name="uuid" type="hidden" value="{{myid}}">
-                            <button type="button" class="remove-file-btn" onclick="removeFileInput(this)" disabled>×</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-file-btn" onclick="addFileInput()">+ Add File</button>
+            <form action="/create" enctype="multipart/form-data" method="post" id="createForm">
+                <input name="uuid" type="hidden" value="{{myid}}">
+                
+                <!-- Drag & Drop Zone -->
+                <div class="upload-zone" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <p class="upload-text">Drag & drop images here or click to browse</p>
+                    <span class="upload-hint">Supports: JPG, PNG (Max 10MB each)</span>
                 </div>
                 
+                <!-- Image Preview Grid -->
+                <div class="image-preview-grid" id="previewGrid"></div>
+                
+                <!-- Text Input with Character Counter -->
                 <div class="text-input-container">
-                    <textarea class="text-input" id="textInput" name="text" placeholder="Enter your text to be added as voice here..." rows="4"></textarea>
+                    <label for="textInput" class="input-label">
+                        <i class="fas fa-microphone"></i> Text for Voiceover
+                    </label>
+                    <textarea class="text-input" id="textInput" name="text" 
+                              placeholder="Enter your text to be converted to voice here..." 
+                              rows="4" maxlength="500"></textarea>
+                    <div class="input-footer">
+                        <span class="char-counter">
+                            <span id="charCount">0</span>/500 characters
+                        </span>
+                        <span class="word-count">
+                            <span id="wordCount">0</span> words
+                        </span>
+                        <button type="button" class="btn-preview-audio" id="previewAudioBtn">
+                            <i class="fas fa-volume-up"></i> Preview Voice
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Voice Selection -->
+                <div class="voice-selection-container">
+                    <label for="voiceSelect" class="input-label">
+                        <i class="fas fa-user"></i> Select Voice
+                    </label>
+                    <div class="voice-controls">
+                        <select name="voice_id" id="voiceSelect" class="voice-dropdown">
+                            <option value="pNInz6obpgDQGcFmaJgB">Adam (Default) - Male, Clear</option>
+                            <option value="EXAVITQu4vr4xnSDxMaL">Bella - Female, Warm</option>
+                            <option value="21m00Tcm4TlvDq8ikWAM">Rachel - Female, Professional</option>
+                            <option value="AZnzlk1XvdvUeBnXmlld">Domi - Female, Energetic</option>
+                            <option value="EXAVITQu4vr4xnSDxMaL">Elli - Female, Soft</option>
+                        </select>
+                        <div class="speed-control">
+                            <label>Speed:</label>
+                            <input type="range" name="voice_speed" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1">
+                            <span id="speedValue">1.0x</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced Options Accordion -->
+                <div class="advanced-options">
+                    <button type="button" class="toggle-advanced" id="toggleAdvanced">
+                        <i class="fas fa-cog"></i> Advanced Options
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="advanced-content" id="advancedContent">
+                        <!-- Background Music -->
+                        <div class="option-group">
+                            <label class="input-label">
+                                <i class="fas fa-music"></i> Background Music
+                            </label>
+                            <div class="music-selection">
+                                <select name="music_file" id="musicSelect" class="music-dropdown">
+                                    <option value="">No Music</option>
+                                    <option value="1.mp3">Track 1 - Upbeat</option>
+                                    <option value="2.mp3">Track 2 - Ambient</option>
+                                    <option value="3.mp3">Track 3 - Energetic</option>
+                                </select>
+                                <div class="music-controls">
+                                    <label>Music Volume:</label>
+                                    <input type="range" name="music_volume" id="musicVolume" min="0" max="100" value="50">
+                                    <span id="volumeValue">50%</span>
+                                </div>
+                                <div class="music-upload">
+                                    <label>Or upload your own:</label>
+                                    <input type="file" name="custom_music" accept="audio/*" id="customMusicInput">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Text Overlays -->
+                        <div class="option-group">
+                            <label class="input-label">
+                                <i class="fas fa-font"></i> Text Overlays
+                            </label>
+                            <div class="overlay-controls">
+                                <input type="text" name="overlay_text" id="overlayText" placeholder="Enter overlay text">
+                                <div class="overlay-options">
+                                    <select name="overlay_position" id="overlayPosition">
+                                        <option value="top">Top</option>
+                                        <option value="center">Center</option>
+                                        <option value="bottom">Bottom</option>
+                                    </select>
+                                    <input type="color" name="overlay_color" id="overlayColor" value="#ffffff">
+                                    <select name="overlay_font" id="overlayFont">
+                                        <option value="Arial">Arial</option>
+                                        <option value="Helvetica">Helvetica</option>
+                                        <option value="Times">Times</option>
+                                        <option value="Courier">Courier</option>
+                                    </select>
+                                    <input type="number" name="overlay_size" id="overlaySize" min="20" max="100" value="40" placeholder="Size">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Video Settings -->
+                        <div class="option-group">
+                            <label class="input-label">
+                                <i class="fas fa-video"></i> Video Settings
+                            </label>
+                            <div class="video-settings">
+                                <div class="setting-item">
+                                    <label>Aspect Ratio:</label>
+                                    <select name="aspect_ratio" id="aspectRatio">
+                                        <option value="9:16">9:16 (Vertical - Reels)</option>
+                                        <option value="16:9">16:9 (Horizontal)</option>
+                                        <option value="1:1">1:1 (Square)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Quality:</label>
+                                    <select name="quality" id="quality">
+                                        <option value="720p">720p HD</option>
+                                        <option value="1080p" selected>1080p Full HD</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Transition:</label>
+                                    <select name="transition" id="transition">
+                                        <option value="none">None</option>
+                                        <option value="fade">Fade</option>
+                                        <option value="slide">Slide</option>
+                                        <option value="zoom">Zoom</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <button type="submit" class="submit-btn" id="submitBtn">
-                    Create Reel
+                    <i class="fas fa-magic"></i> Create Reel
                 </button>
             </form>
         </div>
@@ -68,24 +198,17 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/dragdrop.js') }}"></script>
+<script src="{{ url_for('static', filename='js/create.js') }}"></script>
 <script>
-    let fileCounter = 2; // Start from 2 since we already have file1
-
-    function addFileInput() {
-        const fileInputs = document.getElementById('fileInputs');
-        const newFileInput = document.createElement('div');
-        newFileInput.className = 'file-input-group';
-        newFileInput.innerHTML = `
-            <input name="file${fileCounter}" type="file" class="file-input" />
-            <button type="button" class="remove-file-btn" onclick="removeFileInput(this)">×</button>
-        `;
-        fileInputs.appendChild(newFileInput);
-        fileCounter++;
-    }
-
-    function removeFileInput(button) {
-        const fileInputGroup = button.parentElement;
-        fileInputGroup.remove();
-    }
+    // Voice speed control
+    document.getElementById('voiceSpeed').addEventListener('input', function(e) {
+        document.getElementById('speedValue').textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+    });
+    
+    // Music volume control
+    document.getElementById('musicVolume').addEventListener('input', function(e) {
+        document.getElementById('volumeValue').textContent = e.target.value + '%';
+    });
 </script>
 {% endblock %} 

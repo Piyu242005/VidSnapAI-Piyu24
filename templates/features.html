@@ -1,0 +1,556 @@
+{% extends "base.html" %}
+
+{% block title %}Features - VidSnapAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="features-page">
+    <div class="container">
+        <div class="features-hero">
+            <h1 class="features-title">VidSnapAI Features</h1>
+            <p class="features-subtitle">Everything you need to create stunning video reels</p>
+        </div>
+
+        <!-- Core Features -->
+        <section class="feature-category">
+            <h2 class="category-title">
+                <i class="fas fa-star"></i> Core Features
+            </h2>
+            <p class="category-description">Essential features that make VidSnapAI powerful and easy to use</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Drag & Drop Image Upload</h3>
+                    <p>Easily upload multiple images by dragging and dropping them into the upload zone. No need to click through file dialogs - just drag your images and start creating!</p>
+                    <ul class="feature-details">
+                        <li>Support for JPG, PNG formats</li>
+                        <li>Multiple file selection</li>
+                        <li>Visual feedback during upload</li>
+                        <li>File size validation (max 10MB per file)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h3>Image Preview & Reordering</h3>
+                    <p>See all your uploaded images in a beautiful preview grid. Drag and drop to reorder them, or use the up/down buttons to arrange them exactly how you want.</p>
+                    <ul class="feature-details">
+                        <li>Thumbnail preview for each image</li>
+                        <li>Drag-to-reorder functionality</li>
+                        <li>Move up/down buttons</li>
+                        <li>Individual image removal</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Image Duration Control</h3>
+                    <p>Set how long each image appears in your reel. Control the timing from 0.5 seconds to 5 seconds per image for perfect pacing.</p>
+                    <ul class="feature-details">
+                        <li>Adjustable duration per image</li>
+                        <li>Range: 0.5s to 5s</li>
+                        <li>Real-time preview</li>
+                        <li>Fine-tune your reel's rhythm</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3>AI Text-to-Speech</h3>
+                    <p>Convert your text into natural-sounding voiceovers using advanced AI technology. Choose from multiple voices and customize the speed.</p>
+                    <ul class="feature-details">
+                        <li>Multiple AI voices available</li>
+                        <li>Natural, human-like speech</li>
+                        <li>Speed control (0.5x to 2x)</li>
+                        <li>Preview before generating</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <h3>Automatic Reel Generation</h3>
+                    <p>Combine your images and audio into a professional video reel automatically. Our system handles all the complex video processing for you.</p>
+                    <ul class="feature-details">
+                        <li>Automatic video compilation</li>
+                        <li>Professional quality output</li>
+                        <li>Optimized for social media</li>
+                        <li>Fast processing times</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <h3>Progress Tracking</h3>
+                    <p>See exactly what's happening during reel creation. Real-time progress updates show you each step: upload, audio generation, and video processing.</p>
+                    <ul class="feature-details">
+                        <li>Step-by-step progress display</li>
+                        <li>Percentage completion</li>
+                        <li>Status messages</li>
+                        <li>Cancel option available</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Features -->
+        <section class="feature-category">
+            <h2 class="category-title">
+                <i class="fas fa-magic"></i> Advanced Features
+            </h2>
+            <p class="category-description">Powerful customization options for professional results</p>
+            
+            <div class="features-grid">
+                <div class="feature-card featured">
+                    <div class="feature-badge">Popular</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Voice Selection</h3>
+                    <p>Choose from multiple AI voices to match your content's tone. Each voice has unique characteristics - from professional to energetic.</p>
+                    <ul class="feature-details">
+                        <li>5+ voice options</li>
+                        <li>Male and female voices</li>
+                        <li>Different styles and tones</li>
+                        <li>Voice preview before use</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card featured">
+                    <div class="feature-badge">New</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Background Music</h3>
+                    <p>Add background music to your reels from our library or upload your own. Control the volume to balance music and voice perfectly.</p>
+                    <ul class="feature-details">
+                        <li>Library of royalty-free tracks</li>
+                        <li>Custom music upload</li>
+                        <li>Volume control (0-100%)</li>
+                        <li>Automatic audio mixing</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <h3>Text Overlays</h3>
+                    <p>Add text overlays to your reels with full customization. Choose position, color, font, and size to match your brand or style.</p>
+                    <ul class="feature-details">
+                        <li>Custom text input</li>
+                        <li>Position control (top/center/bottom)</li>
+                        <li>Color picker</li>
+                        <li>Font selection</li>
+                        <li>Size adjustment</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </div>
+                    <h3>Aspect Ratio Options</h3>
+                    <p>Create reels in different aspect ratios to match your platform. Choose from vertical (9:16), horizontal (16:9), or square (1:1) formats.</p>
+                    <ul class="feature-details">
+                        <li>9:16 (Vertical - Instagram Reels, TikTok)</li>
+                        <li>16:9 (Horizontal - YouTube)</li>
+                        <li>1:1 (Square - Instagram Posts)</li>
+                        <li>Automatic image scaling</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-hd-video"></i>
+                    </div>
+                    <h3>Video Quality Selection</h3>
+                    <p>Choose your output quality based on your needs. Select 720p for faster processing or 1080p for maximum quality.</p>
+                    <ul class="feature-details">
+                        <li>720p HD option</li>
+                        <li>1080p Full HD option</li>
+                        <li>Optimized file sizes</li>
+                        <li>Platform-specific recommendations</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>Transition Effects</h3>
+                    <p>Add smooth transitions between images. Choose from fade, slide, zoom, or no transition for a professional look.</p>
+                    <ul class="feature-details">
+                        <li>Fade transitions</li>
+                        <li>Slide effects</li>
+                        <li>Zoom transitions</li>
+                        <li>No transition option</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Features -->
+        <section class="feature-category">
+            <h2 class="category-title">
+                <i class="fas fa-photo-video"></i> Gallery Features
+            </h2>
+            <p class="category-description">Manage and share your created reels effortlessly</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Search & Filter</h3>
+                    <p>Quickly find your reels using the powerful search function. Filter by date, popularity, or search by name.</p>
+                    <ul class="feature-details">
+                        <li>Real-time search</li>
+                        <li>Filter by date (Recent)</li>
+                        <li>Filter by popularity</li>
+                        <li>Sort by name or date</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h3>Share Functionality</h3>
+                    <p>Share your reels easily with shareable links, QR codes, or direct social media integration.</p>
+                    <ul class="feature-details">
+                        <li>Copy shareable link</li>
+                        <li>QR code generation</li>
+                        <li>Social media buttons</li>
+                        <li>One-click sharing</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Download & Export</h3>
+                    <p>Download your reels in high quality for offline use or to upload to other platforms.</p>
+                    <ul class="feature-details">
+                        <li>High-quality downloads</li>
+                        <li>Optimized file sizes</li>
+                        <li>Download tracking</li>
+                        <li>Multiple format support</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                    <h3>Fullscreen Viewing</h3>
+                    <p>Watch your reels in fullscreen mode for the best viewing experience. Perfect for reviewing your work.</p>
+                    <ul class="feature-details">
+                        <li>Fullscreen modal</li>
+                        <li>High-quality playback</li>
+                        <li>Video controls</li>
+                        <li>Easy exit (ESC key)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Analytics & Statistics</h3>
+                    <p>Track your reel performance with built-in analytics. See views, downloads, and creation dates.</p>
+                    <ul class="feature-details">
+                        <li>View count tracking</li>
+                        <li>Download statistics</li>
+                        <li>Creation timestamps</li>
+                        <li>Performance insights</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <h3>Multiple View Modes</h3>
+                    <p>Switch between grid and list views to browse your reels in the way that works best for you.</p>
+                    <ul class="feature-details">
+                        <li>Grid view (default)</li>
+                        <li>List view option</li>
+                        <li>Responsive layouts</li>
+                        <li>Easy view switching</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- UI Features -->
+        <section class="feature-category">
+            <h2 class="category-title">
+                <i class="fas fa-paint-brush"></i> User Interface Features
+            </h2>
+            <p class="category-description">Beautiful, intuitive design that makes creation enjoyable</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Responsive Design</h3>
+                    <p>VidSnapAI works perfectly on all devices - desktop, tablet, and mobile. Create reels anywhere, anytime.</p>
+                    <ul class="feature-details">
+                        <li>Mobile-optimized interface</li>
+                        <li>Touch-friendly controls</li>
+                        <li>Adaptive layouts</li>
+                        <li>Cross-device compatibility</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Toast Notifications</h3>
+                    <p>Get instant feedback on your actions with beautiful toast notifications. Success, error, and info messages keep you informed.</p>
+                    <ul class="feature-details">
+                        <li>Success notifications</li>
+                        <li>Error alerts</li>
+                        <li>Info messages</li>
+                        <li>Auto-dismiss after 3 seconds</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <h3>Keyboard Shortcuts</h3>
+                    <p>Work faster with keyboard shortcuts. Common actions are just a keypress away.</p>
+                    <ul class="feature-details">
+                        <li>Ctrl+S: Save form</li>
+                        <li>Ctrl+Enter: Submit</li>
+                        <li>ESC: Close modals</li>
+                        <li>Arrow keys: Navigate gallery</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3>Character & Word Counter</h3>
+                    <p>Keep track of your text input with real-time character and word counting. Never exceed limits again.</p>
+                    <ul class="feature-details">
+                        <li>Character count (0/500)</li>
+                        <li>Word count display</li>
+                        <li>Visual warnings</li>
+                        <li>Real-time updates</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Live Preview</h3>
+                    <p>Preview your audio before generating the full reel. Test voices and settings to get exactly what you want.</p>
+                    <ul class="feature-details">
+                        <li>Audio preview button</li>
+                        <li>Voice testing</li>
+                        <li>Instant feedback</li>
+                        <li>No waste of processing time</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <h3>Delete & Manage</h3>
+                    <p>Easily delete unwanted reels with confirmation dialogs. Keep your gallery organized and clean.</p>
+                    <ul class="feature-details">
+                        <li>One-click deletion</li>
+                        <li>Confirmation dialogs</li>
+                        <li>Bulk management</li>
+                        <li>Permanent removal</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Wins Section -->
+        <section class="quick-wins-section">
+            <h2 class="category-title">
+                <i class="fas fa-bolt"></i> Quick Wins - Easy Features
+            </h2>
+            <p class="category-description">Simple but powerful features that enhance your experience</p>
+            
+            <div class="quick-wins-grid">
+                <div class="quick-win-item">
+                    <i class="fas fa-spinner"></i>
+                    <h4>Loading Spinners</h4>
+                    <p>Visual feedback during processing</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-skeleton"></i>
+                    <h4>Skeleton Loaders</h4>
+                    <p>Smooth loading experience</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-question-circle"></i>
+                    <h4>Helpful Tooltips</h4>
+                    <p>Contextual help everywhere</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-check-double"></i>
+                    <h4>Form Validation</h4>
+                    <p>Real-time error checking</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Error Handling</h4>
+                    <p>User-friendly error messages</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-moon"></i>
+                    <h4>Dark Mode Ready</h4>
+                    <p>Easy on the eyes</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-link"></i>
+                    <h4>Copy to Clipboard</h4>
+                    <p>Easy link sharing</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-history"></i>
+                    <h4>Recent Reels</h4>
+                    <p>Quick access to latest creations</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-image"></i>
+                    <h4>Thumbnail Generation</h4>
+                    <p>Visual previews</p>
+                </div>
+                <div class="quick-win-item">
+                    <i class="fas fa-undo"></i>
+                    <h4>Undo/Redo</h4>
+                    <p>Mistake-proof editing</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Comparison -->
+        <section class="comparison-section">
+            <h2 class="category-title">
+                <i class="fas fa-balance-scale"></i> Feature Comparison
+            </h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Basic</th>
+                            <th>Advanced</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Image Upload</td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Text-to-Speech</td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Voice Selection</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Background Music</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Text Overlays</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Aspect Ratio Options</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Quality Selection</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <div class="features-cta">
+            <h2>Ready to Experience All These Features?</h2>
+            <p>Start creating amazing reels with VidSnapAI today!</p>
+            <a href="/create" class="cta-button-large">
+                <i class="fas fa-rocket"></i> Get Started Now
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+
+// Animate feature cards on scroll
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in-visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.feature-card').forEach(card => {
+    observer.observe(card);
+});
+</script>
+{% endblock %}
+
