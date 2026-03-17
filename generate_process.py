@@ -1,154 +1,139 @@
-# This file looks for new folders inside user uploads and converts them to reel if they are not already converted
+﻿# This file looks for new folders inside user uploads and converts them to reel 
+# if they are not already converted                                               
 import os 
 import json
+import shutil
 from text_to_audio import text_to_speech_file as tta_core
-
-import subprocess
-
+from pipeline.video_processing import create_premium_reel
+from pipeline.whisper_subtitles import generate_srt
+from pipeline.beat_sync import detect_beats, apply_beat_sync_durations
+import urllib.parse
 
 def text_to_audio(folder):
     print("TTA - ", folder)
-    with open(f"user_uploads/{folder}/desc.txt") as f:
+    with open(f"user_uploads/{folder}/desc.txt", encoding="utf-8") as f:
         text = f.read()
     print(text, folder)
     tta_core(text, folder)
 
-def create_reel(folder, settings=None):
-    # Get absolute paths
-    base_dir = os.path.abspath(os.path.dirname(__file__))
-    input_file = os.path.join(base_dir, f"user_uploads/{folder}/input.txt")
-    audio_file = os.path.join(base_dir, f"user_uploads/{folder}/audio.mp3")
-    output_file = os.path.join(base_dir, f"static/reels/{folder}.mp4")
+def parse_input_txt(input_file, folder_dir):
+    images_data = []
+    if not os.path.exists(input_file):
+        return images_data
+        
+    with open(input_file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
     
-    # Load settings if not provided
+    current_file = None
+    for line in lines:
+        line = line.strip()
+        if line.startswith("file "):
+            # Format: file 'filename.jpg'
+            fname = line.replace("file ", "").strip("'").strip('"')
+            current_file = os.path.join(folder_dir, fname)
+        elif line.startswith("duration "):
+            dur = float(line.replace("duration ", ""))
+            if current_file:
+                images_data.append({"file": current_file, "duration": dur})
+                current_file = None
+    return images_data
+
+def create_reel(folder, settings=None):
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    folder_dir = os.path.join(base_dir, f"user_uploads/{folder}")
+    
     if settings is None:
-        settings_file = os.path.join(base_dir, f"user_uploads/{folder}/settings.json")
+        settings_file = os.path.join(folder_dir, "settings.json")
         if os.path.exists(settings_file):
             with open(settings_file, 'r') as f:
                 settings = json.load(f)
         else:
             settings = {}
-    
-    # Ensure static/reels directory exists
-    os.makedirs(os.path.join(base_dir, "static/reels"), exist_ok=True)
-    
-    # Get aspect ratio and resolution
-    aspect_ratio = settings.get('aspect_ratio', '9:16')
-    quality = settings.get('quality', '1080p')
-    
-    if aspect_ratio == '9:16':
-        width, height = 1080, 1920
-    elif aspect_ratio == '16:9':
-        width, height = 1920, 1080
-    else:  # 1:1
-        width, height = 1080, 1080
-    
-    if quality == '720p':
-        if aspect_ratio == '9:16':
-            width, height = 720, 1280
-        elif aspect_ratio == '16:9':
-            width, height = 1280, 720
-        else:
-            width, height = 720, 720
-    
-    # Build video filter
-    vf_parts = [f"scale={width}:{height}:force_original_aspect_ratio=decrease"]
-    vf_parts.append(f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:black")
-    
-    # Add text overlay if specified
-    overlay_text = settings.get('overlay_text', '')
-    if overlay_text:
-        overlay_position = settings.get('overlay_position', 'bottom')
-        overlay_color = settings.get('overlay_color', '#ffffff')
-        overlay_font = settings.get('overlay_font', 'Arial')
-        overlay_size = settings.get('overlay_size', 40)
-        
-        # Calculate Y position
-        if overlay_position == 'top':
-            y_pos = 50
-        elif overlay_position == 'center':
-            y_pos = f'(h-text_h)/2'
-        else:  # bottom
-            y_pos = f'h-text_h-50'
-        
-        # Escape special characters in text
-        overlay_text_escaped = overlay_text.replace("'", "\\'").replace(":", "\\:")
-        
-        # Add text overlay filter
-        drawtext = f"drawtext=text='{overlay_text_escaped}':fontfile=/Windows/Fonts/{overlay_font}.ttf:fontsize={overlay_size}:fontcolor={overlay_color}:x=(w-text_w)/2:y={y_pos}"
-        vf_parts.append(drawtext)
-    
-    video_filter = ','.join(vf_parts)
-    
-    # Build audio filter (for music mixing)
-    music_file = settings.get('music_file', '')
-    music_volume = int(settings.get('music_volume', 50)) / 100.0
-    
-    if music_file:
-        # Check if custom music or library music
-        if settings.get('custom_music', False):
-            music_path = os.path.join(base_dir, f"user_uploads/{folder}/{music_file}")
-        else:
-            music_path = os.path.join(base_dir, f"static/songs/{music_file}")
-        
-        if os.path.exists(music_path):
-            # Mix audio tracks
-            audio_filter = f"[0:a]volume=1.0[a1];[1:a]volume={music_volume}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2"
-            command = f'''ffmpeg -stream_loop -1 -f concat -safe 0 -i "{input_file}" -i "{audio_file}" -i "{music_path}" -vf "{video_filter}" -filter_complex "{audio_filter}" -c:v libx264 -c:a aac -r 30 -pix_fmt yuv420p -shortest -y "{output_file}"'''
-        else:
-            # Music file not found, use only voice
-            command = f'''ffmpeg -stream_loop -1 -f concat -safe 0 -i "{input_file}" -i "{audio_file}" -vf "{video_filter}" -c:v libx264 -c:a aac -r 30 -pix_fmt yuv420p -shortest -y "{output_file}"'''
+
+    desc_file = os.path.join(folder_dir, "desc.txt")
+    if os.path.exists(desc_file):
+        with open(desc_file, "r", encoding="utf-8", errors="ignore") as f:
+            full_text = f.read()
     else:
-        # No music, use only voice
-        command = f'''ffmpeg -stream_loop -1 -f concat -safe 0 -i "{input_file}" -i "{audio_file}" -vf "{video_filter}" -c:v libx264 -c:a aac -r 30 -pix_fmt yuv420p -shortest -y "{output_file}"'''
+        full_text = "Watch this amazing reel"
+        
+
+    audio_file = os.path.join(folder_dir, "audio.mp3")
     
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    # We can detect background music beats for transitions
+    music_file_name = settings.get('music_file', '')
+    music_track = ""
+    if music_file_name:
+        if settings.get('custom_music', False):
+            music_track = os.path.join(folder_dir, music_file_name)
+        else:
+            music_track = os.path.join(base_dir, "static", "songs", music_file_name)
+            
+    beat_times = []
+    if music_track and os.path.exists(music_track):
+        beat_times = detect_beats(music_track)
+        
+    # Get audio duration theoretically (simplified, or use ffprobe)
+    # Whisper will get the actual times.
     
-    if result.returncode != 0:
-        print(f"FFmpeg Error: {result.stderr}")
-        raise Exception(f"FFmpeg failed with error: {result.stderr}")
+    # Generate Subtitles & Get Total Duration from Voice
+    text_timing_data = generate_srt(audio_file)
+    
+    if text_timing_data:
+        # Give small buffer after last speech
+        total_audio_duration = text_timing_data[-1]['end'] + 1.0 
+    else:
+        # Fallback if no voice
+        total_audio_duration = len(images_data) * 2.5
+        
+    # Inject Viral Hook
+    text_timing_data.insert(0, {
+        "text": "🔥 WAIT FOR THIS...",
+        "start": 0.0,
+        "end": 2.0
+    })
+        
+    # Sync images to beats
+    images_data = apply_beat_sync_durations(images_data, beat_times, total_audio_duration)
+    
+    output_file_final = os.path.join(base_dir, f"static/reels/{folder}.mp4")
+    shutil.move(output_tmp, output_file_final)
     
     print("CR - ", folder)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import time
-    print("VidSnapAI Background Processor Started...")
-    print("Monitoring 'user_uploads' for new content...")
-    
+    print("VidSnapAI Premium Background Processor Started...")
+
     while True:
         try:
             if not os.path.exists("user_uploads"):
                 os.makedirs("user_uploads", exist_ok=True)
-                
+
             folders = [f for f in os.listdir("user_uploads") if os.path.isdir(os.path.join("user_uploads", f))]
-            
             for folder in folders:
-                # Check if this is a temp folder or already processed
                 if folder.startswith('temp_'):
                     continue
-                    
+
                 output_file = f"static/reels/{folder}.mp4"
                 if not os.path.exists(output_file):
-                    # Check if required files exist
                     desc_file = f"user_uploads/{folder}/desc.txt"
                     input_file = f"user_uploads/{folder}/input.txt"
-                    
+
                     if os.path.exists(desc_file) and os.path.exists(input_file):
                         print(f"Processing new folder: {folder}")
                         try:
-                            # Generate audio if not exists
                             audio_file = f"user_uploads/{folder}/audio.mp3"
                             if not os.path.exists(audio_file):
                                 text_to_audio(folder)
-                            
-                            # Create reel
+
                             create_reel(folder)
                             print(f"Successfully processed: {folder}")
                         except Exception as e:
                             print(f"Error processing {folder}: {e}")
-            
-            time.sleep(5)  # Check every 5 seconds
+
+            time.sleep(5)
         except Exception as e:
             print(f"Loop error: {e}")
             time.sleep(10)
