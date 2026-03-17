@@ -1,4 +1,4 @@
-ELEVENLABS_API_KEY = "e4ce732f46343379208a3635d2ae6c82c31e4fbda0b683e0e5596e1210761991"
+ELEVENLABS_API_KEY = "sk_1fa3ccb2c827289052982b2a8a3b82c1db8fbbf4d94abd5d"
 
 
 # python generate_process.py
