@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # 🎬 VidSnapAI
 **Production-Ready AI-Powered Video Generation Engine**
