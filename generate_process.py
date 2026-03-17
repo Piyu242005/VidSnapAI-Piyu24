@@ -1,7 +1,7 @@
 # This file looks for new folders inside user uploads and converts them to reel if they are not already converted
 import os 
 import json
-from text_to_audio import text_to_speech_file
+from text_to_audio import text_to_speech_file as tta_core
 
 import subprocess
 
@@ -11,7 +11,7 @@ def text_to_audio(folder):
     with open(f"user_uploads/{folder}/desc.txt") as f:
         text = f.read()
     print(text, folder)
-    text_to_speech_file(text, folder)
+    tta_core(text, folder)
 
 def create_reel(folder, settings=None):
     # Get absolute paths
@@ -82,7 +82,7 @@ def create_reel(folder, settings=None):
     
     # Build audio filter (for music mixing)
     music_file = settings.get('music_file', '')
-    music_volume = settings.get('music_volume', 50) / 100.0
+    music_volume = int(settings.get('music_volume', 50)) / 100.0
     
     if music_file:
         # Check if custom music or library music
@@ -111,3 +111,44 @@ def create_reel(folder, settings=None):
     print("CR - ", folder)
 
 
+if __name__ == "__main__":
+    import time
+    print("VidSnapAI Background Processor Started...")
+    print("Monitoring 'user_uploads' for new content...")
+    
+    while True:
+        try:
+            if not os.path.exists("user_uploads"):
+                os.makedirs("user_uploads", exist_ok=True)
+                
+            folders = [f for f in os.listdir("user_uploads") if os.path.isdir(os.path.join("user_uploads", f))]
+            
+            for folder in folders:
+                # Check if this is a temp folder or already processed
+                if folder.startswith('temp_'):
+                    continue
+                    
+                output_file = f"static/reels/{folder}.mp4"
+                if not os.path.exists(output_file):
+                    # Check if required files exist
+                    desc_file = f"user_uploads/{folder}/desc.txt"
+                    input_file = f"user_uploads/{folder}/input.txt"
+                    
+                    if os.path.exists(desc_file) and os.path.exists(input_file):
+                        print(f"Processing new folder: {folder}")
+                        try:
+                            # Generate audio if not exists
+                            audio_file = f"user_uploads/{folder}/audio.mp3"
+                            if not os.path.exists(audio_file):
+                                text_to_audio(folder)
+                            
+                            # Create reel
+                            create_reel(folder)
+                            print(f"Successfully processed: {folder}")
+                        except Exception as e:
+                            print(f"Error processing {folder}: {e}")
+            
+            time.sleep(5)  # Check every 5 seconds
+        except Exception as e:
+            print(f"Loop error: {e}")
+            time.sleep(10)
