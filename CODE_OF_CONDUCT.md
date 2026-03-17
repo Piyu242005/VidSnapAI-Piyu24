@@ -1,57 +1,79 @@
-# Code of Conduct: Project Setup and Execution Guide
+# 📜 Code of Conduct
 
-This document serves as the primary guidance file on how to correctly set up, execute, and maintain the **VidSnapAI** project workplace. 
+## 🤝 Our Commitment
 
-## 1. Prerequisites and Environment Setup
+We are committed to providing a welcoming, inclusive, and respectful environment for everyone.
+Contributors, users, and maintainers of **VidSnapAI** are expected to follow this Code of Conduct.
 
-Before you can run the project, ensure you meet the system requirements:
-- **Python:** You must have Python 3.8 or higher installed on your system.
-- **FFmpeg:** FFmpeg is required for video compilation. Ensure it's installed and bound to your OS Path.
-- **ElevenLabs API Key:** You need a valid API key for text-to-speech functionality. 
+---
 
-### Setting up the Virtual Environment
-It is strictly recommended to operate within an isolated virtual environment to prevent dependency conflicts.
-```bash
-# Initialize virtual environment
-python -m venv .venv
+## 🌍 Our Standards
 
-# Activate it (Windows)
-.\.venv\Scripts\activate
+### ✅ Expected Behavior
 
-# Activate it (Linux/MacOS)
-source .venv/bin/activate
-```
+* Be respectful and considerate
+* Use inclusive and welcoming language
+* Accept constructive feedback gracefully
+* Focus on what is best for the community
+* Help others and collaborate positively
 
-## 2. Installing Dependencies
-With the active virtual environment, install the project dependencies:
-```bash
-pip install -r requirements.txt
-```
+---
 
-## 3. Configuration
-You must configure your local environment credentials before running the application. 
-Open `config.py` in the project root directory and update it with your **ElevenLabs API Key**.
+### ❌ Unacceptable Behavior
 
-## 4. Running the Project
-VidSnapAI requires two concurrent processes to function successfully: the web server and the background video processor.
+* Harassment, discrimination, or offensive comments
+* Personal attacks or trolling
+* Spamming or self-promotion without value
+* Sharing private information without permission
+* Any behavior that creates a hostile environment
 
-### Step 1: Boot the Web Server
-In your main terminal (with the virtual environment activated), start the Flask application:
-```bash
-python main.py
-```
-This will start the user interface and backend router.
+---
 
-### Step 2: Boot the Background Processor
-Open a **new, separate terminal**, activate your virtual environment again, and run the asynchronous worker queue:
-```bash
-python generate_process.py
-```
-*Note: If the background processor is not running, requested videos will remain stuck in the queue and will not compile.*
+## ⚖️ Enforcement
 
-## 5. Standard Operating Procedures
-- Ensure both terminals are active during development or generation.
-- Do not commit your personal `config.py` API keys to the repository.
-- Uploaded media is temporarily staged in `user_uploads/` and processed assets are delivered to the frontend components.
+Project maintainers are responsible for enforcing this Code of Conduct.
+They may remove, edit, or reject contributions that do not align with these standards.
 
-By following this code of conduct and setup guide, you can ensure a stable environment for VidSnapAI.
+Repeated violations may result in:
+
+* Warning
+* Temporary restriction
+* Permanent ban from the project
+
+---
+
+## 🚨 Reporting Issues
+
+If you experience or witness unacceptable behavior:
+
+* Open an issue in the repository
+* Or contact the maintainer directly
+
+All reports will be handled confidentially and respectfully.
+
+---
+
+## 👨‍💻 Maintainer
+
+**Piyush Ramteke**
+Data Scientist & Full Stack Developer
+
+---
+
+## 📌 Scope
+
+This Code of Conduct applies to:
+
+* GitHub repository interactions
+* Issues, pull requests, and discussions
+* Any official project communication channels
+
+---
+
+## 📄 Acknowledgement
+
+By participating in this project, you agree to follow this Code of Conduct.
+
+---
+
+⭐ Thank you for helping make this project respectful and collaborative!
