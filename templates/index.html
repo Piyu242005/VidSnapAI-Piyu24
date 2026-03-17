@@ -1,55 +1,236 @@
 {% extends "base.html" %}
 
-{% block title %}AI Reel Generator - Create Amazing Instagram Reels{% endblock %}
+{% block title %}VidSnapAI — AI Reel Generator{% endblock %}
 
 {% block content %}
+
+<!-- ═══════════════ HERO ═══════════════ -->
 <section class="hero-section">
     <div class="container">
-        <h1 class="hero-title">Create Amazing Instagram Reels with AI</h1>
-        <p class="hero-subtitle">Transform your videos into engaging reels with our AI-powered platform</p>
-        <a href="/create" class="cta-button">Start Creating Now</a>
+
+        <!-- Live badge -->
+        <div class="hero-badge" data-aos="fade-down">
+            <span class="dot"></span>
+            AI-Powered Reel Generation
+        </div>
+
+        <h1 class="hero-title" data-aos="fade-up" data-aos-delay="80">
+            Create Amazing<br>Instagram Reels with AI
+        </h1>
+
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="160">
+            Transform your images into stunning video reels with AI voiceover,
+            background music, and smooth transitions — in minutes.
+        </p>
+
+        <div data-aos="fade-up" data-aos-delay="240">
+            <a href="/create" class="cta-button">
+                <i class="fas fa-magic"></i>
+                Start Creating Free
+            </a>
+        </div>
+
+        <!-- Trust stats row -->
+        <div class="hero-stats" data-aos="fade-up" data-aos-delay="320">
+            <div class="hero-stat">
+                <span class="hero-stat-num">10K+</span>
+                <span class="hero-stat-label">Reels Created</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <span class="hero-stat-num">5K+</span>
+                <span class="hero-stat-label">Active Users</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <span class="hero-stat-num">4.8★</span>
+                <span class="hero-stat-label">User Rating</span>
+            </div>
+        </div>
+
     </div>
 </section>
 
+<!-- ═══════════════ FEATURES ═══════════════ -->
 <section class="features-section">
     <div class="container">
+
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-eyebrow">Why VidSnapAI?</span>
+            <h2 class="section-heading">Everything You Need to Go Viral</h2>
+            <p class="section-subheading">
+                From drag-and-drop upload to AI voiceover — one platform, zero learning curve.
+            </p>
+        </div>
+
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="60">
                 <div class="feature-card">
-                    <i class="fas fa-magic feature-icon"></i>
+                    <div class="feature-icon-wrap">
+                        <i class="fas fa-magic feature-icon"></i>
+                    </div>
                     <h3>AI-Powered Editing</h3>
-                    <p>Let our AI analyze and enhance your videos automatically</p>
+                    <p>Let our AI analyze, stitch, and enhance your images into a captivating reel automatically.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="130">
                 <div class="feature-card">
-                    <i class="fas fa-film feature-icon"></i>
-                    <h3>Smart Stitching</h3>
-                    <p>Seamlessly combine multiple clips into perfect reels</p>
+                    <div class="feature-icon-wrap">
+                        <i class="fas fa-microphone feature-icon"></i>
+                    </div>
+                    <h3>AI Voiceover</h3>
+                    <p>Choose from multiple premium voices powered by ElevenLabs TTS for natural-sounding narration.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-card">
-                    <i class="fas fa-music feature-icon"></i>
+                    <div class="feature-icon-wrap">
+                        <i class="fas fa-music feature-icon"></i>
+                    </div>
                     <h3>Music Integration</h3>
-                    <p>Add trending music and sound effects to your reels</p>
+                    <p>Add trending background tracks, control volume, and upload your own audio effortlessly.</p>
                 </div>
             </div>
         </div>
+
+        <!-- CTA row -->
+        <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="80">
+            <a href="/features" class="btn-features-link">
+                Explore all features <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
     </div>
 </section>
 
+<!-- ═══════════════ SHOWCASE ═══════════════ -->
 <section class="showcase-section">
     <div class="container">
-        <h2 class="showcase-title">Featured Creations</h2>
-        <div class="image-grid">
-            <img src="{{ url_for('static', filename='1.jpg') }}" alt="Reel Example 1" class="showcase-image">
-            <img src="{{ url_for('static', filename='2.jpg') }}" alt="Reel Example 2" class="showcase-image">
-            <img src="{{ url_for('static', filename='3.jpg') }}" alt="Reel Example 3" class="showcase-image">
-            <img src="{{ url_for('static', filename='4.jpg') }}" alt="Reel Example 4" class="showcase-image">
-            <img src="{{ url_for('static', filename='5.jpg') }}" alt="Reel Example 5" class="showcase-image">
+
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-eyebrow">Gallery Preview</span>
+            <h2 class="showcase-title">Featured Creations</h2>
         </div>
+
+        <div class="image-grid">
+            <div class="showcase-image-wrap" data-aos="zoom-in" data-aos-delay="40">
+                <img src="{{ url_for('static', filename='1.jpg') }}" alt="Reel Example 1" class="showcase-image" loading="lazy">
+                <div class="showcase-image-overlay">
+                    <i class="fas fa-expand showcase-overlay-icon"></i>
+                </div>
+            </div>
+            <div class="showcase-image-wrap" data-aos="zoom-in" data-aos-delay="100">
+                <img src="{{ url_for('static', filename='2.jpg') }}" alt="Reel Example 2" class="showcase-image" loading="lazy">
+                <div class="showcase-image-overlay">
+                    <i class="fas fa-expand showcase-overlay-icon"></i>
+                </div>
+            </div>
+            <div class="showcase-image-wrap" data-aos="zoom-in" data-aos-delay="160">
+                <img src="{{ url_for('static', filename='3.jpg') }}" alt="Reel Example 3" class="showcase-image" loading="lazy">
+                <div class="showcase-image-overlay">
+                    <i class="fas fa-expand showcase-overlay-icon"></i>
+                </div>
+            </div>
+            <div class="showcase-image-wrap" data-aos="zoom-in" data-aos-delay="220">
+                <img src="{{ url_for('static', filename='4.jpg') }}" alt="Reel Example 4" class="showcase-image" loading="lazy">
+                <div class="showcase-image-overlay">
+                    <i class="fas fa-expand showcase-overlay-icon"></i>
+                </div>
+            </div>
+            <div class="showcase-image-wrap" data-aos="zoom-in" data-aos-delay="280">
+                <img src="{{ url_for('static', filename='5.jpg') }}" alt="Reel Example 5" class="showcase-image" loading="lazy">
+                <div class="showcase-image-overlay">
+                    <i class="fas fa-expand showcase-overlay-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="/gallery" class="cta-button">
+                <i class="fas fa-photo-video"></i>
+                View Full Gallery
+            </a>
+        </div>
+
     </div>
 </section>
+
 {% endblock %}
- 
+
+{% block extra_css %}
+<style>
+/* ── Hero stats row ───────────────────────────────────────────── */
+.hero-stats {
+    display: inline-flex;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,0,0,0.18);
+    border-radius: 999px;
+    backdrop-filter: blur(12px);
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.hero-stat-num {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.hero-stat-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.hero-stat-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(255,0,0,0.2);
+}
+
+/* ── Features CTA link ───────────────────────────────────────── */
+.btn-features-link {
+    color: var(--accent-color, #ff0000);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding: 0.65rem 1.5rem;
+    border: 1.5px solid rgba(255,0,0,0.35);
+    border-radius: 999px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-features-link:hover {
+    background: rgba(255,0,0,0.1);
+    border-color: var(--accent-color, #ff0000);
+    color: var(--accent-color, #ff0000);
+    box-shadow: 0 0 20px rgba(255,0,0,0.25);
+}
+
+@media (max-width: 576px) {
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+        border-radius: 20px;
+        padding: 1.25rem 1.75rem;
+    }
+    .hero-stat-divider { width: 50px; height: 1px; }
+}
+</style>
+{% endblock %}

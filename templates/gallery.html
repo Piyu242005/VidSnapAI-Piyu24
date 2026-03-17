@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Gallery - AI Reel Generator{% endblock %}
+{% block title %}Gallery — VidSnapAI{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
@@ -8,13 +8,19 @@
 
 {% block content %}
 <div class="container gallery-container">
-    <h1 class="gallery-title">
+
+    <!-- Header -->
+    <h1 class="gallery-title" data-aos="fade-down">
         <i class="fas fa-photo-video"></i> Reel Gallery
     </h1>
-    <p class="gallery-subtitle">Browse your AI-generated video reels</p>
-    
+    <p class="gallery-subtitle" data-aos="fade-down" data-aos-delay="60">
+        Browse and manage your AI-generated video reels
+    </p>
+
     {% if reels %}
-    <div class="gallery-controls">
+
+    <!-- Controls bar -->
+    <div class="gallery-controls" data-aos="fade-up" data-aos-delay="80">
         <div class="search-box">
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Search reels...">
@@ -25,12 +31,12 @@
             <button class="filter-btn" data-filter="popular">Popular</button>
         </div>
         <div class="sort-controls">
-            <label>Sort by:</label>
+            <label>Sort:</label>
             <select id="sortSelect">
                 <option value="date-desc">Newest First</option>
                 <option value="date-asc">Oldest First</option>
-                <option value="name-asc">Name A-Z</option>
-                <option value="name-desc">Name Z-A</option>
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
             </select>
         </div>
         <div class="view-toggle">
@@ -42,69 +48,86 @@
             </button>
         </div>
     </div>
-    
-    <div class="gallery-stats">
+
+    <!-- Stats pill -->
+    <div class="gallery-stats" data-aos="fade-up" data-aos-delay="120">
         <span class="stat-item">
-            <i class="fas fa-video"></i> <span id="reelCount">{{ reels|length }}</span> Reel{{ 's' if reels|length != 1 else '' }}
+            <i class="fas fa-video"></i>
+            <span id="reelCount">{{ reels|length }}</span> Reel{{ 's' if reels|length != 1 else '' }}
         </span>
     </div>
-    
+
+    <!-- Gallery grid -->
     <div class="gallery-grid" id="galleryGrid">
         {% for reel in reels %}
         {% set reel_id = reel.rsplit('.', 1)[0] %}
         {% set reel_meta = metadata.get(reel_id, {}) %}
-        <div class="gallery-item" data-reel-id="{{ reel_id }}" data-reel-name="{{ reel }}">
+        <div class="gallery-item"
+             data-reel-id="{{ reel_id }}"
+             data-reel-name="{{ reel }}"
+             data-aos="fade-up"
+             data-aos-delay="{{ loop.index0 * 60 }}">
             <div class="reel-card">
                 <div class="video-wrapper">
                     <div class="reel-thumbnail">
-                        <video 
-                            class="reel-video" 
-                            src="{{ url_for('static', filename='reels/' + reel) }}" 
+                        <video
+                            class="reel-video"
+                            src="{{ url_for('static', filename='reels/' + reel) }}"
                             preload="metadata"
-                            onloadedmetadata="this.currentTime=1"
-                        >
+                            onloadedmetadata="this.currentTime=1">
                             Your browser does not support the video tag.
                         </video>
                         <div class="reel-overlay">
-                            <button class="btn-play" onclick="playReel(this)">
+                            <button class="btn-play" onclick="playReel(this)" title="Play">
                                 <i class="fas fa-play"></i>
                             </button>
                             <div class="reel-stats-overlay">
-                                <span><i class="fas fa-eye"></i> <span class="view-count">{{ reel_meta.get('views', 0) }}</span></span>
-                                <span><i class="fas fa-download"></i> <span class="download-count">{{ reel_meta.get('downloads', 0) }}</span></span>
+                                <span>
+                                    <i class="fas fa-eye"></i>
+                                    <span class="view-count">{{ reel_meta.get('views', 0) }}</span>
+                                </span>
+                                <span>
+                                    <i class="fas fa-download"></i>
+                                    <span class="download-count">{{ reel_meta.get('downloads', 0) }}</span>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="reel-info">
                     <h3 class="reel-title">
-                        <i class="fas fa-film"></i> {{ reel.rsplit('.', 1)[0][:30] }}{{ '...' if reel.rsplit('.', 1)[0]|length > 30 else '' }}
+                        <i class="fas fa-film"></i>
+                        {{ reel.rsplit('.', 1)[0][:28] }}{{ '…' if reel.rsplit('.', 1)[0]|length > 28 else '' }}
                     </h3>
                     <p class="reel-date">
-                        <i class="fas fa-calendar"></i> 
+                        <i class="fas fa-calendar-alt"></i>
                         {% if reel_meta.get('created_at') %}
                             {{ reel_meta.get('created_at')[:10] }}
                         {% else %}
-                            Unknown
+                            Unknown date
                         {% endif %}
                     </p>
                     <div class="reel-actions">
-                        <button class="btn-share" onclick="shareReel('{{ reel_id }}', '{{ reel }}')" title="Share">
+                        <button class="btn-share"
+                                onclick="shareReel('{{ reel_id }}', '{{ reel }}')"
+                                title="Share">
                             <i class="fas fa-share-alt"></i> Share
                         </button>
-                        <a href="{{ url_for('static', filename='reels/' + reel) }}" 
-                           download="{{ reel }}" 
+                        <a href="{{ url_for('static', filename='reels/' + reel) }}"
+                           download="{{ reel }}"
                            class="btn-download"
                            onclick="trackDownload('{{ reel_id }}')"
                            title="Download">
                             <i class="fas fa-download"></i> Download
                         </a>
-                        <button class="btn-fullscreen" 
+                        <button class="btn-fullscreen"
                                 onclick="openFullscreen('{{ url_for('static', filename='reels/' + reel) }}')"
-                                title="View Fullscreen">
-                            <i class="fas fa-expand"></i> Fullscreen
+                                title="Fullscreen">
+                            <i class="fas fa-expand"></i>
                         </button>
-                        <button class="btn-delete" onclick="deleteReel('{{ reel_id }}', '{{ reel }}')" title="Delete">
+                        <button class="btn-delete"
+                                onclick="deleteReel('{{ reel_id }}', '{{ reel }}')"
+                                title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -113,66 +136,64 @@
         </div>
         {% endfor %}
     </div>
+
     {% else %}
-    <div class="empty-gallery">
+
+    <!-- Empty state -->
+    <div class="empty-gallery" data-aos="fade-up">
         <i class="fas fa-video-slash"></i>
         <h2>No Reels Yet</h2>
-        <p>Start creating amazing reels with VidSnapAI!</p>
+        <p>Start creating amazing AI-powered reels with VidSnapAI!</p>
         <a href="/create" class="btn-create">
             <i class="fas fa-plus-circle"></i> Create Your First Reel
         </a>
     </div>
+
     {% endif %}
-</div>
 
-<!-- Fullscreen Modal -->
-<div id="fullscreenModal" class="modal-fullscreen" onclick="closeFullscreen()">
-    <span class="close-modal">&times;</span>
-    <video id="fullscreenVideo" controls autoplay>
-        Your browser does not support the video tag.
-    </video>
-</div>
-{% endblock %}
+    <!-- ─── Fullscreen Modal (single, inside content block) ─── -->
+    <div id="fullscreenModal" class="modal-fullscreen" onclick="closeFullscreen()">
+        <span class="close-modal" title="Close">&times;</span>
+        <video id="fullscreenVideo" controls autoplay>
+            Your browser does not support the video tag.
+        </video>
+    </div>
 
-<!-- Share Modal -->
-<div id="shareModal" class="modal-share">
-    <div class="share-content">
-        <span class="close-share">&times;</span>
-        <h3>Share Reel</h3>
-        <div class="share-options">
-            <div class="share-url">
-                <input type="text" id="shareUrlInput" readonly>
-                <button class="btn-copy" onclick="copyShareUrl()">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
+    <!-- ─── Share Modal (moved inside content block — was broken) ─── -->
+    <div id="shareModal" class="modal-share">
+        <div class="share-content" onclick="event.stopPropagation()">
+            <span class="close-share" title="Close">&times;</span>
+            <h3><i class="fas fa-share-alt me-2" style="color:#ff0000;"></i>Share Reel</h3>
+            <div class="share-options">
+                <div class="share-url">
+                    <input type="text" id="shareUrlInput" readonly placeholder="Generating link…">
+                    <button class="btn-copy" onclick="copyShareUrl()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="social-share">
+                    <a href="#" class="social-btn instagram" id="shareInstagram" target="_blank" rel="noopener">
+                        <i class="fab fa-instagram"></i> Share on Instagram
+                    </a>
+                    <a href="#" class="social-btn tiktok" id="shareTikTok" target="_blank" rel="noopener">
+                        <i class="fab fa-tiktok"></i> Share on TikTok
+                    </a>
+                    <a href="#" class="social-btn youtube" id="shareYouTube" target="_blank" rel="noopener">
+                        <i class="fab fa-youtube"></i> Share on YouTube
+                    </a>
+                </div>
+                <div class="qr-code-container" id="qrCodeContainer"></div>
             </div>
-            <div class="social-share">
-                <a href="#" class="social-btn instagram" id="shareInstagram" target="_blank">
-                    <i class="fab fa-instagram"></i> Instagram
-                </a>
-                <a href="#" class="social-btn tiktok" id="shareTikTok" target="_blank">
-                    <i class="fab fa-tiktok"></i> TikTok
-                </a>
-                <a href="#" class="social-btn youtube" id="shareYouTube" target="_blank">
-                    <i class="fab fa-youtube"></i> YouTube
-                </a>
-            </div>
-            <div class="qr-code-container" id="qrCodeContainer"></div>
         </div>
     </div>
-</div>
 
-<!-- Fullscreen Modal -->
-<div id="fullscreenModal" class="modal-fullscreen" onclick="closeFullscreen()">
-    <span class="close-modal">&times;</span>
-    <video id="fullscreenVideo" controls autoplay>
-        Your browser does not support the video tag.
-    </video>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/gallery.js') }}"></script>
 <script>
+/* ── Fullscreen ───────────────────────────────────────────── */
 function openFullscreen(videoSrc) {
     const modal = document.getElementById('fullscreenModal');
     const video = document.getElementById('fullscreenVideo');
@@ -190,148 +211,114 @@ function closeFullscreen() {
     video.src = '';
 }
 
+/* ── Play inline ──────────────────────────────────────────── */
 function playReel(btn) {
-    const video = btn.closest('.reel-card').querySelector('.reel-video');
+    const video  = btn.closest('.reel-card').querySelector('.reel-video');
     const overlay = btn.closest('.reel-overlay');
-    
     if (video.paused) {
         video.play();
         overlay.style.display = 'none';
         video.setAttribute('controls', 'controls');
-        
         const reelId = btn.closest('.gallery-item').dataset.reelId;
         trackView(reelId);
     }
 }
 
+/* ── Share ────────────────────────────────────────────────── */
 function shareReel(reelId, reelName) {
     fetch(`/api/share/${reelId}`)
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
-            const modal = document.getElementById('shareModal');
+            const modal    = document.getElementById('shareModal');
             const urlInput = document.getElementById('shareUrlInput');
             const shareUrl = data.share_url || `${window.location.origin}/static/reels/${reelName}`;
-            
             urlInput.value = shareUrl;
-            
-            // Update social share links
-            document.getElementById('shareInstagram').href = `https://www.instagram.com/create/story/?media=${encodeURIComponent(shareUrl)}`;
-            document.getElementById('shareTikTok').href = `https://www.tiktok.com/upload?video=${encodeURIComponent(shareUrl)}`;
-            document.getElementById('shareYouTube').href = `https://www.youtube.com/upload?video=${encodeURIComponent(shareUrl)}`;
-            
-            // Generate QR code (using a simple API or library)
+            document.getElementById('shareInstagram').href =
+                `https://www.instagram.com/create/story/?media=${encodeURIComponent(shareUrl)}`;
+            document.getElementById('shareTikTok').href =
+                `https://www.tiktok.com/upload?video=${encodeURIComponent(shareUrl)}`;
+            document.getElementById('shareYouTube').href =
+                `https://www.youtube.com/upload?video=${encodeURIComponent(shareUrl)}`;
             generateQRCode(shareUrl);
-            
             modal.style.display = 'flex';
         })
-        .catch(error => {
-            console.error('Share error:', error);
-            if (window.notifications) {
-                window.notifications.error('Failed to generate share link.');
-            }
+        .catch(() => {
+            if (window.notifications) window.notifications.error('Failed to generate share link.');
         });
 }
 
 function copyShareUrl() {
     const urlInput = document.getElementById('shareUrlInput');
-    urlInput.select();
-    document.execCommand('copy');
-    if (window.notifications) {
-        window.notifications.success('Share URL copied to clipboard!');
-    }
+    navigator.clipboard.writeText(urlInput.value).catch(() => {
+        urlInput.select();
+        document.execCommand('copy');
+    });
+    if (window.notifications) window.notifications.success('Link copied to clipboard!');
 }
 
 function generateQRCode(url) {
-    // Simple QR code generation using API
-    const qrContainer = document.getElementById('qrCodeContainer');
-    qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" alt="QR Code">`;
+    const qr = document.getElementById('qrCodeContainer');
+    qr.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}" alt="QR Code" loading="lazy">`;
 }
 
+/* ── Delete ───────────────────────────────────────────────── */
 function deleteReel(reelId, reelName) {
-    if (!confirm(`Are you sure you want to delete "${reelName}"? This action cannot be undone.`)) {
-        return;
-    }
-    
-    fetch(`/api/delete/${reelId}`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const item = document.querySelector(`[data-reel-id="${reelId}"]`);
-            if (item) {
-                item.remove();
-                updateReelCount();
-                if (window.notifications) {
-                    window.notifications.success('Reel deleted successfully.');
-                }
-            }
-        } else {
-            throw new Error(data.error || 'Failed to delete reel');
-        }
-    })
-    .catch(error => {
-        console.error('Delete error:', error);
-        if (window.notifications) {
-            window.notifications.error('Failed to delete reel. Please try again.');
-        }
-    });
+    if (!confirm(`Delete "${reelName}"?\nThis action cannot be undone.`)) return;
+    fetch(`/api/delete/${reelId}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const item = document.querySelector(`[data-reel-id="${reelId}"]`);
+                if (item) { item.remove(); updateReelCount(); }
+                if (window.notifications) window.notifications.success('Reel deleted.');
+            } else throw new Error(data.error || 'Failed');
+        })
+        .catch(() => {
+            if (window.notifications) window.notifications.error('Failed to delete reel.');
+        });
 }
 
+/* ── Track view / download ────────────────────────────────── */
 function trackView(reelId) {
-    fetch(`/api/track-view/${reelId}`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const item = document.querySelector(`[data-reel-id="${reelId}"]`);
-            if (item) {
-                const viewCount = item.querySelector('.view-count');
-                if (viewCount) {
-                    viewCount.textContent = parseInt(viewCount.textContent) + 1;
-                }
+    fetch(`/api/track-view/${reelId}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const el = document.querySelector(`[data-reel-id="${reelId}"] .view-count`);
+                if (el) el.textContent = parseInt(el.textContent) + 1;
             }
-        }
-    })
-    .catch(error => console.error('Track view error:', error));
+        }).catch(() => {});
 }
 
 function trackDownload(reelId) {
-    fetch(`/api/track-download/${reelId}`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const item = document.querySelector(`[data-reel-id="${reelId}"]`);
-            if (item) {
-                const downloadCount = item.querySelector('.download-count');
-                if (downloadCount) {
-                    downloadCount.textContent = parseInt(downloadCount.textContent) + 1;
-                }
+    fetch(`/api/track-download/${reelId}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const el = document.querySelector(`[data-reel-id="${reelId}"] .download-count`);
+                if (el) el.textContent = parseInt(el.textContent) + 1;
             }
-        }
-    })
-    .catch(error => console.error('Track download error:', error));
+        }).catch(() => {});
 }
 
 function updateReelCount() {
     const count = document.querySelectorAll('.gallery-item').length;
-    const countEl = document.getElementById('reelCount');
-    if (countEl) {
-        countEl.textContent = count;
-    }
+    const el = document.getElementById('reelCount');
+    if (el) el.textContent = count;
 }
 
-// Close share modal
+/* ── Modal close events ───────────────────────────────────── */
 document.querySelector('.close-share').addEventListener('click', () => {
     document.getElementById('shareModal').style.display = 'none';
 });
 
-// Close modal on Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
+// Close share modal clicking outside content
+document.getElementById('shareModal').addEventListener('click', function (e) {
+    if (e.target === this) this.style.display = 'none';
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
         closeFullscreen();
         document.getElementById('shareModal').style.display = 'none';
     }
