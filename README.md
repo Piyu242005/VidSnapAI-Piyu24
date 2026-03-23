@@ -60,6 +60,10 @@ VidSnapAI is a premium, AI-driven platform for automating the creation of high-i
 
 ## 🏗️ Architecture
 
+<p align="center">
+  <img src="vidsnapai_full_workflow.svg" alt="VidSnapAI System Architecture & Workflow" width="100%" />
+</p>
+
 1. **Ingestion:** Frontend sends generation requests and media to the Flask API.
 2. **Text-to-Speech:** Text payload is synthesized into neural speech via API.
 3. **Transcription:** Audio is processed for accurate, word-synced subtitles.
