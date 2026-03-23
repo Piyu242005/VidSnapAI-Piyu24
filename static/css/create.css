@@ -1,3 +1,4 @@
+
 /* ═══════════════════════════════════════════════════════════════
    VidSnapAI — Create Reel Page
    ═══════════════════════════════════════════════════════════════ */
@@ -17,13 +18,13 @@
     max-width: 820px;
     margin: 0 auto;
     padding: 2.5rem 2.5rem 3rem;
-    background: rgba(8, 8, 8, 0.88);
-    border: 1px solid var(--border-default, rgba(255,0,0,0.3));
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 24px;
-    box-shadow: 0 24px 64px rgba(255, 0, 0, 0.12), 0 4px 16px rgba(0,0,0,0.6);
+    box-shadow: var(--shadow);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
 }
 
 .upload-title {
@@ -41,18 +42,12 @@
 .upload-instructions {
     text-align: center;
     margin-bottom: 2.25rem;
-    color: var(--text-gray, #aaa);
+    color: var(--text-secondary);
     font-size: 0.95rem;
     line-height: 1.6;
 }
 
-/* ── Animated dashed upload zone ─────────────────────────────── */
-@property --angle {
-    syntax: '<angle>';
-    initial-value: 0deg;
-    inherits: false;
-}
-
+/* ── Simple dashed upload zone ──────────────────────────────── */
 .upload-zone {
     position: relative;
     padding: 3rem 2rem;
@@ -60,58 +55,27 @@
     cursor: pointer;
     margin-bottom: 2rem;
     border-radius: 18px;
-    background: rgba(255, 0, 0, 0.035);
+    background: var(--bg-secondary);
     transition: all 0.3s ease;
-    /* Dashed border via border-image + background animation */
-    border: 2px dashed rgba(255, 0, 0, 0.35);
-    color: var(--text-light, #fff);
-}
-
-/* Animated rotating conic gradient border overlay */
-.upload-zone::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 18px;
-    background: conic-gradient(
-        from var(--angle),
-        transparent 82%,
-        rgba(255, 0, 0, 0.8) 88%,
-        rgba(255, 80, 80, 1) 92%,
-        rgba(255, 0, 0, 0.8) 96%,
-        transparent 100%
-    );
-    animation: borderRotate 4s linear infinite;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-@keyframes borderRotate {
-    to { --angle: 360deg; }
+    border: 2px dashed var(--border-color);
+    color: var(--text-primary);
 }
 
 .upload-zone:hover,
 .upload-zone.drag-over {
-    background: rgba(255, 0, 0, 0.07);
-    border-color: rgba(255, 0, 0, 0.6);
+    background: var(--bg-primary);
+    border-color: var(--accent-color);
     transform: translateY(-2px);
-    box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.08), 0 8px 24px rgba(255, 0, 0, 0.18);
-}
-
-.upload-zone:hover::before,
-.upload-zone.drag-over::before {
-    opacity: 1;
+    box-shadow: var(--shadow);
 }
 
 .upload-zone.drag-over {
-    background: rgba(255, 0, 0, 0.12);
     transform: scale(1.01);
 }
 
 .upload-icon {
     font-size: 3.5rem;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
     margin-bottom: 1rem;
     display: block;
     filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.4));
@@ -125,13 +89,13 @@
 .upload-text {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     margin-bottom: 0.4rem;
 }
 
 .upload-hint {
     font-size: 0.85rem;
-    color: var(--text-gray, #999);
+    color: var(--text-secondary);
 }
 
 /* ── Image preview grid ──────────────────────────────────────── */
@@ -143,8 +107,8 @@
 }
 
 .preview-card {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--border-default, rgba(255,0,0,0.3));
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -152,7 +116,7 @@
 }
 
 .preview-card:hover {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 4px 16px rgba(255, 0, 0, 0.3);
     transform: translateY(-4px);
 }
@@ -177,7 +141,7 @@
     position: absolute;
     top: 6px;
     left: 6px;
-    background: var(--accent-color, #ff0000);
+    background: var(--accent-color);
     color: #fff;
     width: 26px;
     height: 26px;
@@ -198,7 +162,7 @@
 
 .duration-control label {
     font-size: 0.78rem;
-    color: var(--text-gray, #999);
+    color: var(--text-secondary);
     display: block;
     margin-bottom: 0.2rem;
 }
@@ -206,16 +170,16 @@
 .duration-input {
     width: 100%;
     padding: 0.4rem 0.5rem;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 0.85rem;
-    background: rgba(0,0,0,0.5);
-    color: var(--text-light, #fff);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .duration-input:focus {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.18);
     outline: none;
 }
@@ -228,9 +192,9 @@
 }
 
 .btn-move-up, .btn-move-down, .btn-remove {
-    background: rgba(255, 0, 0, 0.08);
-    border: 1px solid rgba(255, 0, 0, 0.25);
-    color: var(--accent-color, #ff0000);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--accent-color);
     width: 28px;
     height: 28px;
     border-radius: 6px;
@@ -243,13 +207,13 @@
 }
 
 .btn-move-up:hover, .btn-move-down:hover {
-    background: rgba(255, 0, 0, 0.18);
+    background: var(--accent-hover);
     transform: scale(1.08);
 }
 
 .btn-remove:hover {
-    background: var(--accent-color, #ff0000);
-    border-color: var(--accent-color, #ff0000);
+    background: var(--accent-color);
+    border-color: var(--accent-color);
     color: #fff;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
 }
@@ -261,12 +225,12 @@
     gap: 0.5rem;
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     margin-bottom: 0.6rem;
     letter-spacing: -0.01em;
 }
 
-.input-label i { color: var(--accent-color, #ff0000); }
+.input-label i { color: var(--accent-color); }
 
 /* ── Voiceover textarea ──────────────────────────────────────── */
 .text-input-container { margin: 0 0 2rem; }
@@ -274,11 +238,11 @@
 .text-input {
     width: 100%;
     padding: 1rem 1.1rem;
-    border: 1.5px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1.5px solid var(--border-color);
     border-radius: 14px;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--bg-secondary);
     font-size: 0.95rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     resize: vertical;
     min-height: 110px;
     font-family: inherit;
@@ -286,15 +250,15 @@
     transition: border-color 0.25s, box-shadow 0.25s;
 }
 
-.text-input::placeholder { color: rgba(255,255,255,0.35); }
+.text-input::placeholder { color: var(--text-secondary); }
 
-.text-input:hover { border-color: rgba(255, 0, 0, 0.5); }
+.text-input:hover { border-color: var(--accent-hover); }
 
 .text-input:focus {
     outline: none;
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15);
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--bg-primary);
 }
 
 .input-footer {
@@ -307,15 +271,15 @@
     flex-wrap: wrap;
 }
 
-.char-counter, .word-count { color: var(--text-gray, #999); }
+.char-counter, .word-count { color: var(--text-secondary); }
 
 .btn-preview-audio {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    background: rgba(255, 0, 0, 0.08);
-    border: 1px solid rgba(255, 0, 0, 0.35);
-    color: var(--accent-color, #ff0000);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--accent-color);
     padding: 0.45rem 1rem;
     border-radius: 8px;
     cursor: pointer;
@@ -325,8 +289,8 @@
 }
 
 .btn-preview-audio:hover {
-    background: rgba(255, 0, 0, 0.18);
-    box-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+    background: var(--accent-hover);
+    box-shadow: var(--shadow);
     transform: translateY(-1px);
 }
 
@@ -334,13 +298,13 @@
 .voice-selection-container {
     margin: 0 0 1.75rem;
     padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--bg-secondary);
     border-radius: 16px;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.2));
+    border: 1px solid var(--border-color);
     transition: border-color 0.3s;
 }
 
-.voice-selection-container:hover { border-color: rgba(255, 0, 0, 0.45); }
+.voice-selection-container:hover { border-color: var(--accent-hover); }
 
 .voice-controls {
     display: flex;
@@ -353,11 +317,11 @@
     flex: 1;
     min-width: 200px;
     padding: 0.8rem 1rem;
-    border: 1.5px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--bg-secondary);
     font-size: 0.92rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     cursor: pointer;
     transition: border-color 0.25s, box-shadow 0.25s;
     -webkit-appearance: none;
@@ -369,12 +333,12 @@
 }
 
 .voice-dropdown:focus {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15);
     outline: none;
 }
 
-.voice-dropdown option { background: #0d0d0d; color: #fff; }
+.voice-dropdown option { background: var(--bg-primary); color: var(--text-primary); }
 
 .speed-control {
     display: flex;
@@ -384,7 +348,7 @@
 
 .speed-control label {
     font-size: 0.85rem;
-    color: var(--text-gray, #999);
+    color: var(--text-secondary);
     white-space: nowrap;
 }
 
@@ -392,7 +356,7 @@
 
 #speedValue {
     font-weight: 700;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
     min-width: 40px;
     font-size: 0.9rem;
 }
@@ -400,7 +364,7 @@
 /* ── Advanced Options accordion ──────────────────────────────── */
 .advanced-options {
     margin: 0 0 2rem;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.2));
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     overflow: hidden;
 }
@@ -408,9 +372,9 @@
 .toggle-advanced {
     width: 100%;
     padding: 1.1rem 1.5rem;
-    background: rgba(0, 0, 0, 0.45);
+    background: var(--bg-secondary);
     border: none;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
@@ -422,11 +386,11 @@
     letter-spacing: -0.01em;
 }
 
-.toggle-advanced:hover { background: rgba(255, 0, 0, 0.1); }
+.toggle-advanced:hover { background: var(--bg-primary); }
 
 .toggle-advanced i:first-child {
     margin-right: 0.4rem;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
 }
 
 .toggle-advanced .fa-chevron-down {
@@ -455,22 +419,22 @@
 
 .music-dropdown {
     padding: 0.8rem 1rem;
-    border: 1.5px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--bg-secondary);
     font-size: 0.92rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     cursor: pointer;
     transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .music-dropdown:focus {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15);
     outline: none;
 }
 
-.music-dropdown option { background: #0d0d0d; }
+.music-dropdown option { background: var(--bg-primary); color: var(--text-primary); }
 
 .music-controls {
     display: flex;
@@ -480,7 +444,7 @@
 
 .music-controls label {
     font-size: 0.85rem;
-    color: var(--text-gray, #999);
+    color: var(--text-secondary);
     white-space: nowrap;
 }
 
@@ -488,28 +452,28 @@
 
 #volumeValue {
     font-weight: 700;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
     min-width: 50px;
     font-size: 0.9rem;
 }
 
 .music-upload { display: flex; flex-direction: column; gap: 0.5rem; }
 
-.music-upload label { font-size: 0.85rem; color: var(--text-gray, #999); }
+.music-upload label { font-size: 0.85rem; color: var(--text-secondary); }
 
 .music-upload input[type="file"] {
     padding: 0.5rem;
-    border: 1px dashed var(--border-default, rgba(255,0,0,0.3));
+    border: 1px dashed var(--border-color);
     border-radius: 8px;
-    background: rgba(0,0,0,0.3);
-    color: var(--text-light, #fff);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     cursor: pointer;
     font-size: 0.85rem;
     transition: border-color 0.25s;
 }
 
 .music-upload input[type="file"]:hover {
-    border-color: rgba(255, 0, 0, 0.55);
+    border-color: var(--accent-hover);
 }
 
 /* ── Text overlay controls ───────────────────────────────────── */
@@ -518,21 +482,21 @@
 .overlay-controls input[type="text"] {
     width: 100%;
     padding: 0.8rem 1rem;
-    border: 1.5px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
-    background: rgba(0,0,0,0.55);
+    background: var(--bg-secondary);
     font-size: 0.92rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .overlay-controls input[type="text"]:focus {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15);
     outline: none;
 }
 
-.overlay-controls input[type="text"]::placeholder { color: rgba(255,255,255,0.35); }
+.overlay-controls input[type="text"]::placeholder { color: var(--text-secondary); }
 
 .overlay-options {
     display: flex;
@@ -544,17 +508,17 @@
 .overlay-options select,
 .overlay-options input[type="number"] {
     padding: 0.65rem 0.85rem;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1px solid var(--border-color);
     border-radius: 10px;
-    background: rgba(0,0,0,0.55);
+    background: var(--bg-secondary);
     font-size: 0.88rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     transition: border-color 0.2s;
 }
 
 .overlay-options select:focus,
 .overlay-options input[type="number"]:focus {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     outline: none;
     box-shadow: 0 0 0 2px rgba(255,0,0,0.15);
 }
@@ -562,16 +526,16 @@
 .overlay-options input[type="color"] {
     width: 46px;
     height: 38px;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    background: rgba(0,0,0,0.55);
+    background: var(--bg-secondary);
     cursor: pointer;
     padding: 2px;
 }
 
 .overlay-options input[type="number"] { width: 80px; }
 .overlay-options select { min-width: 110px; }
-.overlay-options select option { background: #0d0d0d; }
+.overlay-options select option { background: var(--bg-primary); color: var(--text-primary); }
 
 /* ── Video settings ──────────────────────────────────────────── */
 .video-settings { display: flex; flex-direction: column; gap: 1rem; }
@@ -585,29 +549,29 @@
 .setting-item label {
     min-width: 120px;
     font-size: 0.88rem;
-    color: var(--text-gray, #999);
+    color: var(--text-secondary);
     flex-shrink: 0;
 }
 
 .setting-item select {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 1.5px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--bg-secondary);
     font-size: 0.92rem;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     cursor: pointer;
     transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .setting-item select:focus {
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15);
     outline: none;
 }
 
-.setting-item select option { background: #0d0d0d; }
+.setting-item select option { background: var(--bg-primary); color: var(--text-primary); }
 
 /* ── Submit button ───────────────────────────────────────────── */
 .submit-btn {
@@ -657,7 +621,7 @@
 }
 
 .submit-btn:disabled {
-    background: rgba(60, 60, 60, 0.6);
+    background: var(--bg-secondary);
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
@@ -667,7 +631,7 @@
 .success-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.93);
+    background: var(--bg-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -677,16 +641,16 @@
 }
 
 .success-content {
-    background: rgba(8, 8, 8, 0.98);
+    background: var(--card-bg);
     padding: 3rem 2.5rem;
     border-radius: 24px;
     text-align: center;
     max-width: 480px;
     width: 90%;
     border: 1px solid rgba(255, 0, 0, 0.5);
-    box-shadow: 0 0 60px rgba(255, 0, 0, 0.2), 0 24px 60px rgba(0,0,0,0.6);
+    box-shadow: var(--shadow);
     animation: slideUp 0.4s cubic-bezier(0.34, 1.3, 0.64, 1);
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
 }
 
 @keyframes slideUp {
@@ -696,7 +660,7 @@
 
 .success-icon {
     font-size: 4.5rem;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
     margin-bottom: 1.25rem;
     text-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
     animation: successPop 0.5s cubic-bezier(0.34, 1.5, 0.64, 1) 0.1s both;
@@ -716,7 +680,7 @@
 }
 
 .success-content p {
-    color: var(--text-gray, #aaa);
+    color: var(--text-secondary);
     margin-bottom: 2rem;
     font-size: 1rem;
     line-height: 1.6;
@@ -760,29 +724,29 @@
 
 .btn-view-reel {
     background: transparent;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
     border: 1.5px solid rgba(255, 0, 0, 0.5);
 }
 
 .btn-view-reel:hover {
     background: rgba(255, 0, 0, 0.1);
-    border-color: var(--accent-color, #ff0000);
+    border-color: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: 0 0 16px rgba(255, 0, 0, 0.25);
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
 }
 
 .btn-create-another {
     background: transparent;
-    color: rgba(255, 255, 255, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     font-size: 0.88rem;
 }
 
 .btn-create-another:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 0, 0, 0.35);
-    color: #fff;
+    background: var(--bg-secondary);
+    border-color: var(--accent-hover);
+    color: var(--text-primary);
     transform: translateY(-1px);
 }
 
@@ -790,7 +754,7 @@
 .error-alert {
     background: rgba(255, 0, 0, 0.08);
     border: 1.5px solid rgba(255, 0, 0, 0.5);
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     padding: 1.25rem 1.5rem;
     border-radius: 14px;
     margin-bottom: 2rem;
@@ -802,7 +766,7 @@
 
 .error-alert i {
     font-size: 1.5rem;
-    color: var(--accent-color, #ff0000);
+    color: var(--accent-color);
     flex-shrink: 0;
 }
 
@@ -817,10 +781,10 @@
 .file-input {
     flex: 1;
     padding: 8px;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.3));
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    background: rgba(0,0,0,0.5);
-    color: var(--text-light, #fff);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .add-file-btn {
@@ -841,9 +805,9 @@
 }
 
 .remove-file-btn {
-    background: rgba(255,0,0,0.1);
-    color: var(--accent-color, #ff0000);
-    border: 1px solid rgba(255,0,0,0.3);
+    background: var(--bg-primary);
+    color: var(--accent-color);
+    border: 1px solid var(--border-color);
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -855,7 +819,7 @@
 }
 
 .remove-file-btn:hover {
-    background: var(--accent-color, #ff0000);
+    background: var(--accent-color);
     color: #fff;
     box-shadow: 0 0 10px rgba(255,0,0,0.4);
     transform: scale(1.1);
@@ -891,3 +855,4 @@
 
     .success-content { padding: 2rem 1.5rem; }
 }
+

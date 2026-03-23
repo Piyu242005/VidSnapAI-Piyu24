@@ -38,7 +38,7 @@
 .section-title {
     font-size: 1.75rem;
     font-weight: 800;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     margin-bottom: 2rem;
     display: flex;
     align-items: center;
@@ -201,7 +201,7 @@
     padding: 2.25rem;
     background: rgba(8, 8, 8, 0.85);
     border-radius: 20px;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.25));
+    border: 1px solid var(--border-color));
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
@@ -236,7 +236,7 @@
     padding: 2.25rem 1.5rem;
     border-radius: 18px;
     text-align: center;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.25));
+    border: 1px solid var(--border-color));
     transition: all 0.35s ease;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -272,7 +272,7 @@
 .stat-number {
     font-size: 2.75rem;
     font-weight: 900;
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     margin-bottom: 0.35rem;
     letter-spacing: -0.04em;
     background: linear-gradient(135deg, #fff, #ffaaaa);
@@ -304,7 +304,7 @@
     padding: 2rem 1.5rem;
     border-radius: 18px;
     text-align: center;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.25));
+    border: 1px solid var(--border-color));
     transition: all 0.35s ease;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -328,7 +328,7 @@
 .tech-card:hover i { transform: scale(1.1) rotate(-5deg); }
 
 .tech-card h3 {
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
     font-weight: 700;
@@ -347,7 +347,7 @@
     padding: 2.25rem;
     background: rgba(8, 8, 8, 0.85);
     border-radius: 20px;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.25));
+    border: 1px solid var(--border-color));
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
@@ -402,7 +402,7 @@
 }
 
 .team-card h3 {
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
     font-size: 1rem;
     font-weight: 700;
@@ -420,7 +420,7 @@
     padding: 2.25rem;
     background: rgba(8, 8, 8, 0.85);
     border-radius: 20px;
-    border: 1px solid var(--border-default, rgba(255,0,0,0.25));
+    border: 1px solid var(--border-color));
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
@@ -460,7 +460,7 @@
 
 .contact-item span,
 .contact-item a {
-    color: var(--text-light, #fff);
+    color: var(--text-primary);
     font-size: 1rem;
     text-decoration: none;
     transition: color 0.2s;
