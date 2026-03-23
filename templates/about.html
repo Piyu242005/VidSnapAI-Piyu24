@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}About - VidSnapAI{% endblock %}
 
@@ -7,234 +7,115 @@
 {% endblock %}
 
 {% block content %}
-<section class="about-section">
+<!-- Hero Section -->
+<section class="about-hero" data-aos="fade-down">
     <div class="container">
-        <div class="about-hero" data-aos="fade-down">
-            <h1 class="about-title">About VidSnapAI</h1>
-            <p class="about-subtitle">Transforming Ideas into Engaging Video Reels</p>
-        </div>
+        <h1>About <span style="color: var(--accent-color);">VidSnapAI</span></h1>
+        <p>Empowering creators with AI-powered video generation at the speed of thought.</p>
+    </div>
+</section>
 
-        <div class="team-member-section" data-aos="fade-up">
-            <div class="team-member-container">
-                <div class="team-card-wrapper">
-                    <!-- Image Container - Fully visible -->
-                    <div class="team-image-container">
-                        <img src="{{ url_for('static', filename='Piyu24.jpg') }}" alt="Piyush Ramteke"
-                            class="team-image-full">
-                    </div>
-
-                    <!-- Info Container - Below the image -->
-                    <div class="team-info-card">
-                        <div class="team-info-header">
-                            <div>
-                                <h3 class="team-name">Piyush Ramteke</h3>
-                                <p class="team-role">Data Scientist</p>
-                            </div>
-                            <div class="team-arrow-icon">
-                                <i class="fas fa-arrow-up-right-from-square"></i>
-                            </div>
-                        </div>
-                        <p class="team-description">Data Scientist focused on building scalable data-driven solutions, machine learning models, and AI-powered applications.</p>
-                        <div class="team-social">
-                            <a href="https://www.instagram.com/my.life_24143/" target="_blank" class="social-link"
-                                aria-label="Instagram">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            <a href="https://www.linkedin.com/in/piyu24" target="_blank" class="social-link"
-                                aria-label="LinkedIn">
-                                <i class="fab fa-linkedin"></i>
-                            </a>
-                            <a href="https://github.com/Piyu242005" target="_blank" class="social-link"
-                                aria-label="GitHub">
-                                <i class="fab fa-github"></i>
-                            </a>
-                        </div>
-                    </div>
+<!-- Mission Section - Two Column -->
+<section class="mission-section" data-aos="fade-up">
+    <div class="container">
+        <div class="mission-container">
+            <div class="mission-content">
+                <h2>Our Mission</h2>
+                <p>We're on a mission to democratize video creation. In a world where video content dominates social media, we believe everyone should have access to professional-grade tools without the complexity or cost.</p>
+                <br>
+                <p>VidSnapAI combines cutting-edge artificial intelligence with an intuitive interface to transform your ideas into captivating video reels in minutes—not hours. Whether you're an influencer, marketer, or content creator, we're here to supercharge your creative process.</p>
+            </div>
+            <div class="mission-visual">
+                <div style="text-align: center; background: var(--bg-secondary); padding: 40px; border-radius: 20px; border: 1px solid var(--border-color);">
+                    <i class="fas fa-rocket" style="font-size: 80px; color: var(--accent-color); margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.2rem; font-weight: 600; margin-top: 20px; color: var(--text-primary);">Fast, Smart, Creative</p>
                 </div>
             </div>
-        </div>
-
-        <div class="mission-section" data-aos="fade-up">
-            <h2 class="section-title">
-                <i class="fas fa-bullseye"></i> Our Mission
-            </h2>
-            <p class="mission-text">
-                VidSnapAI is dedicated to making video content creation accessible, fast, and enjoyable for everyone.
-                We combine cutting-edge AI technology with intuitive design to help creators transform their images
-                and ideas into stunning video reels that captivate audiences.
-            </p>
-            <p class="mission-text">
-                Whether you're a social media influencer, content creator, marketer, or just someone who loves
-                sharing moments, VidSnapAI empowers you to create professional-quality reels in minutes, not hours.
-            </p>
-        </div>
-
-        <div class="stats-section" data-aos="fade-up">
-            <h2 class="section-title">
-                <i class="fas fa-chart-line"></i> Our Impact
-            </h2>
-            <div class="stats-grid">
-                <div class="stat-card" data-aos="zoom-in" data-aos-delay="0">
-                    <div class="stat-icon">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <div class="stat-number" data-count="10000">0</div>
-                    <div class="stat-label">Reels Created</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-number" data-count="5000">0</div>
-                    <div class="stat-label">Active Users</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="stat-number" data-count="50000">0</div>
-                    <div class="stat-label">Total Views</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-number" data-count="4.8">0</div>
-                    <div class="stat-label">User Rating</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tech-section">
-            <h2 class="section-title">
-                <i class="fas fa-code"></i> Technology Stack
-            </h2>
-            <div class="tech-grid">
-                <div class="tech-card">
-                    <i class="fab fa-python"></i>
-                    <h3>Python & Flask</h3>
-                    <p>Robust backend framework for reliable performance</p>
-                </div>
-                <div class="tech-card">
-                    <i class="fas fa-robot"></i>
-                    <h3>AI Text-to-Speech</h3>
-                    <p>ElevenLabs integration for natural voice generation</p>
-                </div>
-                <div class="tech-card">
-                    <i class="fas fa-film"></i>
-                    <h3>FFmpeg</h3>
-                    <p>Professional video processing and editing</p>
-                </div>
-                <div class="tech-card">
-                    <i class="fab fa-html5"></i>
-                    <h3>Modern Web Technologies</h3>
-                    <p>HTML5, CSS3, JavaScript for seamless user experience</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="team-section">
-            <h2 class="section-title">
-                <i class="fas fa-users"></i> Our Team
-            </h2>
-            <p class="team-intro">
-                VidSnapAI is built by a passionate team of developers, designers, and AI enthusiasts
-                who believe in making creative tools accessible to everyone.
-            </p>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <h3>Development Team</h3>
-                    <p>Building innovative features and ensuring smooth performance</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-avatar">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <h3>Design Team</h3>
-                    <p>Creating beautiful, intuitive user interfaces</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-avatar">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3>AI Research</h3>
-                    <p>Advancing AI capabilities for better content creation</p>
-                </div>
-            </div>
-        </div>
-
-
-
-        <div class="contact-section">
-            <h2 class="section-title">
-                <i class="fas fa-envelope"></i> Get in Touch
-            </h2>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>piyu.143247@gmail.com</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fab fa-github"></i>
-                    <span><a href="https://github.com/Piyu242005">Visit GitHub Piyush Ramteke</a></span>
-                </div>
-                <div class="contact-item">
-                    <i class="fab fa-linkedin"></i>
-                    <a href="https://www.linkedin.com/in/piyu24" target="_blank">
-                        linkedin.com/in/piyu24
-                    </a>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="cta-section">
-            <h2>Ready to Create Amazing Reels?</h2>
-            <p>Join thousands of creators using VidSnapAI to bring their ideas to life.</p>
-            <a href="/create" class="cta-button">
-                <i class="fas fa-plus-circle"></i> Start Creating Now
-            </a>
         </div>
     </div>
 </section>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-    // Animate statistics on scroll
-    document.addEventListener('DOMContentLoaded', () => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statNumbers = entry.target.querySelectorAll('.stat-number');
-                    statNumbers.forEach(stat => {
-                        const target = parseFloat(stat.dataset.count);
-                        const duration = 2000;
-                        const increment = target / (duration / 16);
-                        let current = 0;
+<!-- Features Grid -->
+<section class="features-section" data-aos="fade-up">
+    <div class="container">
+        <div class="features-header">
+            <h2>Why Choose VidSnapAI?</h2>
+            <p>Experience the next generation of video creation</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="0">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Create stunning video reels in seconds. Our optimized AI engine processes your content instantly without compromising quality.</p>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="100">
+                <div class="feature-icon">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <h3>Smart AI</h3>
+                <p>Intelligent beat synchronization, automatic transitions, and context-aware effects make your videos shine without manual tweaking.</p>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="200">
+                <div class="feature-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+                <h3>Fully Customizable</h3>
+                <p>Tailor every aspect of your reel. From filters to fonts to timing, you control the creative direction while AI handles the heavy lifting.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-                        const timer = setInterval(() => {
-                            current += increment;
-                            if (current >= target) {
-                                stat.textContent = target % 1 === 0 ? target.toFixed(0) : target.toFixed(1);
-                                clearInterval(timer);
-                            } else {
-                                stat.textContent = current % 1 === 0 ? current.toFixed(0) : current.toFixed(1);
-                            }
-                        }, 16);
-                    });
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.5 });
+<!-- Tech Stack Section -->
+<section class="tech-stack-section" data-aos="fade-up">
+    <div class="container">
+        <div class="tech-stack-title">
+            <h2>Core Technology</h2>
+            <p>Leveraging powerful algorithms and modern frameworks</p>
+        </div>
+        <div class="tech-badges">
+            <span class="tech-badge">Python</span>
+            <span class="tech-badge">Flask</span>
+            <span class="tech-badge">OpenAI Whisper</span>
+            <span class="tech-badge">FFmpeg</span>
+            <span class="tech-badge">Data Science</span>
+            <span class="tech-badge">Machine Learning</span>
+        </div>
+    </div>
+</section>
 
-        const statsSection = document.querySelector('.stats-section');
-        if (statsSection) {
-            observer.observe(statsSection);
-        }
-    });
-</script>
+<!-- Team Section -->
+<section class="team-section" data-aos="fade-up">
+    <div class="container">
+        <div class="tech-stack-title" style="margin-bottom: 3rem;">
+            <h2>Built by Experts</h2>
+            <p>The engineering behind VidSnapAI</p>
+        </div>
+        <div class="team-member-container" style="max-width: 400px; margin: 0 auto; text-align: center;">
+            <div class="feature-card">
+                <img src="{{ url_for('static', filename='Piyu24.jpg') }}" alt="Piyush Ramteke" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; border: 3px solid var(--border-color);">
+                <h3>Piyush Ramteke</h3>
+                <p style="color: var(--text-secondary); font-weight: 500; margin-bottom: 15px;">Senior AI Developer & Founder</p>
+                <p>Specializing in full-stack architecture and leveraging neural networks to simplify the creator economy.</p>
+                <div style="margin-top: 25px; display: flex; justify-content: center; gap: 20px; font-size: 1.2rem;">
+                    <a href="https://github.com/Piyu242005" target="_blank" style="color: var(--text-secondary); transition: var(--ease-fast);"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/piyu24" target="_blank" style="color: var(--text-secondary); transition: var(--ease-fast);"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section" data-aos="fade-up">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Start Creating Your AI Videos Today</h2>
+            <p>Transform your script to screen with one click. No editing experience required.</p>
+            <a href="/create" class="cta-btn">Start Creating Now</a>
+        </div>
+    </div>
+</section>
 {% endblock %}
