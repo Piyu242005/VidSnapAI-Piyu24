@@ -107,6 +107,11 @@
                             Unknown date
                         {% endif %}
                     </p>
+                    {% if reel_meta.get('text') %}
+                    <p class="reel-text-preview" style="font-size: 0.85em; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 10px;" title="{{ reel_meta.get('text') }}">
+                        <i class="fas fa-quote-left"></i> {{ reel_meta.get('text') }}
+                    </p>
+                    {% endif %}
                     <div class="reel-actions">
                         <button class="btn-share"
                                 onclick="shareReel('{{ reel_id }}', '{{ reel }}')"

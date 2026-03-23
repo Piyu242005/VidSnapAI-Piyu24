@@ -72,6 +72,9 @@ def create_reel(folder, settings=None):
     beat_times = []
     if music_track and os.path.exists(music_track):
         beat_times = detect_beats(music_track)
+
+    input_file = os.path.join(folder_dir, "input.txt")
+    images_data = parse_input_txt(input_file, folder_dir)
         
     # Get audio duration theoretically (simplified, or use ffprobe)
     # Whisper will get the actual times.
@@ -95,6 +98,8 @@ def create_reel(folder, settings=None):
         
     # Sync images to beats
     images_data = apply_beat_sync_durations(images_data, beat_times, total_audio_duration)
+    
+    output_tmp = create_premium_reel(folder_dir, images_data, text_timing_data, settings)
     
     output_file_final = os.path.join(base_dir, f"static/reels/{folder}.mp4")
     shutil.move(output_tmp, output_file_final)

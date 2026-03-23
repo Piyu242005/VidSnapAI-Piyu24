@@ -4,43 +4,68 @@ from werkzeug.utils import secure_filename
 import os
 import json
 from datetime import datetime
+from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+
+# Load environment variables
+load_dotenv()
+
 from text_to_audio import text_to_speech_file as text_to_audio
 from generate_process import create_reel
 
 UPLOAD_FOLDER = 'user_uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-METADATA_FILE = 'reels_metadata.json'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
 
-# Load metadata
-def load_metadata():
-    if os.path.exists(METADATA_FILE):
-        with open(METADATA_FILE, 'r') as f:
-            return json.load(f)
-    return {}
+# Database Configuration
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-def save_metadata(metadata):
-    with open(METADATA_FILE, 'w') as f:
-        json.dump(metadata, f, indent=2)
+# Validate critical environment variables
+if not os.getenv("ELEVENLABS_API_KEY"):
+    print("WARNING: ELEVENLABS_API_KEY is not set in environment variables.")
 
-def update_reel_stats(reel_id, stat_type='view'):
-    metadata = load_metadata()
-    if reel_id not in metadata:
-        metadata[reel_id] = {
-            'views': 0,
-            'downloads': 0,
-            'created_at': datetime.now().isoformat()
+# Database Models
+class Reel(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    text = db.Column(db.Text, nullable=True)
+    voice_id = db.Column(db.String(50), nullable=True)
+    music_file = db.Column(db.String(100), nullable=True)
+    settings = db.Column(db.Text, nullable=True) # Stored as JSON string
+    views = db.Column(db.Integer, default=0)
+    downloads = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'text': self.text,
+            'voice_id': self.voice_id,
+            'music_file': self.music_file,
+            'settings': json.loads(self.settings) if self.settings else {},
+            'views': self.views,
+            'downloads': self.downloads,
+            'created_at': self.created_at.isoformat()
         }
-    
-    if stat_type == 'view':
-        metadata[reel_id]['views'] = metadata[reel_id].get('views', 0) + 1
-    elif stat_type == 'download':
-        metadata[reel_id]['downloads'] = metadata[reel_id].get('downloads', 0) + 1
-    
-    save_metadata(metadata)
+
+# Create all tables on startup
+with app.app_context():
+    db.create_all()
+
+# Helper for old metadata structure mapping
+def update_reel_stats(reel_id, stat_type='view'):
+    reel = Reel.query.get(reel_id)
+    if reel:
+        if stat_type == 'view':
+            reel.views += 1
+        elif stat_type == 'download':
+            reel.downloads += 1
+        db.session.commit()
  
 
 @app.route("/")
@@ -131,29 +156,28 @@ def create():
             text_to_speech_file(desc, rec_id, voice_id=voice_id, speed=voice_speed)
             create_reel(rec_id, settings=settings)
             
-            
-            # Save metadata
-            metadata = load_metadata()
-            metadata[rec_id] = {
-                'views': 0,
-                'downloads': 0,
-                'created_at': datetime.now().isoformat(),
-                'text': desc,
-                'voice_id': voice_id,
-                'music_file': settings.get('music_file', ''),
-                'settings': settings
-            }
-            save_metadata(metadata)
+            # Save metadata to database
+            new_reel = Reel(
+                id=rec_id,
+                text=desc,
+                voice_id=voice_id,
+                music_file=settings.get('music_file', ''),
+                settings=json.dumps(settings)
+            )
+            db.session.add(new_reel)
+            db.session.commit()
             
             success = True
             reel_filename = f"{rec_id}.mp4"
+            error_message = None
         except Exception as e:
             print(f"Error generating reel: {e}")
             import traceback
             traceback.print_exc()
             success = False
             reel_filename = None
-        return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename)
+            error_message = str(e)
+        return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename, error_message=error_message)
 
     return render_template("create.html", myid=myid)
 
@@ -166,8 +190,11 @@ def gallery():
     else:
         reels = [f for f in os.listdir(reels_dir) if f.endswith(('.mp4', '.avi', '.mov', '.mkv'))]
     
-    # Sort by creation date (newest first)
-    metadata = load_metadata()
+    # Query all reels from database, sort by creation date
+    db_reels = Reel.query.order_by(Reel.created_at.desc()).all()
+    metadata = {reel.id: reel.to_dict() for reel in db_reels}
+    
+    # Sort file list to match database order
     reels.sort(key=lambda x: metadata.get(x.replace('.mp4', ''), {}).get('created_at', ''), reverse=True)
     
     print(f"Found {len(reels)} reels: {reels}")
@@ -204,13 +231,14 @@ def preview_audio():
             if os.path.exists(audio_path):
                 return send_file(audio_path, mimetype='audio/mpeg')
             else:
-                return jsonify({'error': 'Failed to generate audio'}), 500
-        finally:
-            # Cleanup temp folder after a delay (or use background task)
-            pass
+                return jsonify({'error': 'Audio file was not generated. Check ElevenLabs API Key.'}), 500
+                
+        except Exception as e:
+            print(f"Error previewing audio: {e}")
+            return jsonify({'error': str(e)}), 500
             
     except Exception as e:
-        print(f"Preview audio error: {e}")
+        print(f"Server error in preview: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route("/api/share/<reel_id>")
@@ -237,11 +265,11 @@ def delete_reel(reel_id):
         if os.path.exists(reel_path):
             os.remove(reel_path)
             
-            # Remove from metadata
-            metadata = load_metadata()
-            if reel_id in metadata:
-                del metadata[reel_id]
-                save_metadata(metadata)
+            # Remove from database
+            reel = Reel.query.get(reel_id)
+            if reel:
+                db.session.delete(reel)
+                db.session.commit()
             
             # Remove upload folder
             upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], reel_id)
@@ -258,13 +286,14 @@ def delete_reel(reel_id):
 
 @app.route("/api/reel-stats/<reel_id>")
 def reel_stats(reel_id):
-    metadata = load_metadata()
-    reel_data = metadata.get(reel_id, {})
-    return jsonify({
-        'views': reel_data.get('views', 0),
-        'downloads': reel_data.get('downloads', 0),
-        'created_at': reel_data.get('created_at', '')
-    })
+    reel = Reel.query.get(reel_id)
+    if reel:
+        return jsonify({
+            'views': reel.views,
+            'downloads': reel.downloads,
+            'created_at': reel.created_at.isoformat()
+        })
+    return jsonify({'views': 0, 'downloads': 0, 'created_at': ''})
 
 @app.route("/api/track-view/<reel_id>", methods=["POST"])
 def track_view(reel_id):

@@ -17,13 +17,21 @@
                 </div>
                 <h2>Reel Created Successfully!</h2>
                 <p>Your reel has been generated and saved to the gallery.</p>
+                {% if reel_filename %}
+                <div class="video-preview-container" style="margin: 20px 0; display: flex; justify-content: center;">
+                    <video controls width="100%" style="max-width: 320px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <source src="{{ url_for('static', filename='reels/' + reel_filename) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                {% endif %}
                 <div class="success-actions">
                     <a href="/gallery" class="btn-view-gallery">
                         <i class="fas fa-photo-video"></i> View in Gallery
                     </a>
                     {% if reel_filename %}
-                    <a href="{{ url_for('static', filename='reels/' + reel_filename) }}" target="_blank" class="btn-view-reel">
-                        <i class="fas fa-play-circle"></i> Watch Your Reel
+                    <a href="{{ url_for('static', filename='reels/' + reel_filename) }}" download class="btn-view-reel" style="background-color:#4CAF50;">
+                        <i class="fas fa-download"></i> Download Reel
                     </a>
                     {% endif %}
                     <button onclick="location.reload()" class="btn-create-another">
@@ -33,9 +41,13 @@
             </div>
         </div>
         {% elif success is defined and not success %}
-        <div class="error-alert">
+        <div class="error-alert" style="background-color: #ffebee; border-left: 4px solid #f44336; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #d32f2f;">
             <i class="fas fa-exclamation-triangle"></i>
-            <strong>Error!</strong> There was an issue creating your reel. Please try again.
+            <strong>Error!</strong> There was an issue creating your reel.
+            {% if error_message %}
+            <p style="margin-top: 5px; font-family: monospace; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 4px;">Error Details: {{ error_message }}</p>
+            {% endif %}
+            <p>Please check your inputs and try again, or check server logs if you are the administrator.</p>
         </div>
         {% endif %}
         <div class="upload-container" data-aos="fade-up" data-aos-delay="60">
