@@ -1,5 +1,10 @@
-ELEVENLABS_API_KEY = "sk_1fa3ccb2c827289052982b2a8a3b82c1db8fbbf4d94abd5d"
+import os
+from dotenv import load_dotenv
 
+# Do not hardcode secrets
+load_dotenv()
+
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
 # python generate_process.py
 # #Run the generation script in the background to process any future uploads:
