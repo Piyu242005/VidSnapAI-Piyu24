@@ -1,6 +1,7 @@
 ﻿<div align="center">
 
 # 🎬 VidSnapAI
+
 **Production-Ready AI-Powered Video Generation Engine**
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
@@ -10,64 +11,71 @@
 [![Whisper](https://img.shields.io/badge/OpenAI-Whisper-blueviolet?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/research/whisper)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE.md)
 
-VidSnapAI is a premium, AI-driven platform for automating the creation of high-impact short-form video content (Instagram Reels, TikToks, YouTube Shorts). By orchestrating intelligent **Whisper-powered subtitles**, **Beat-synced transitions**, and **Neural Speech AI**, it transforms base media into professional-quality social media campaigns at scale.
-
-[🌟 Explore Demo](#-ui--design-highlights) • [🚀 Getting Started](#%EF%B8%8F-installation--setup) • [🗺️ Roadmap](ROADMAP.md) • [📄 API Docs](API.md)
+[🌟 Live Demo](#-demo) • [✨ Features](#-features) • [🚀 Installation](#-installation)
 
 </div>
 
 ---
 
-## 📺 Demo & Previews
+## 💡 Product Overview
 
-Experience the premium interface designed for high-conversion creator workflows:
+VidSnapAI is a premium, AI-driven platform for automating the creation of high-impact short-form video content like Instagram Reels, TikToks, and YouTube Shorts. It's built for developers and content creators who need to generate professional videos at scale using intelligent transcription, dynamic transitions, and high-quality synthetic voice.
+
+---
+
+## ✨ Features
+
+### 🧠 AI Features
+*   🎙️ **Neural Voice Synthesis:** Studio-quality voiceovers powered by the ElevenLabs API.
+*   🖋️ **Whisper Subtitles:** Automated word-sync transcription with OpenAI Whisper.
+
+### 🎬 Video Processing
+*   🥁 **Beat-Synced Transitions:** Intelligent audio analysis matching cuts to background music.
+*   🔊 **Audio Ducking:** Professional sound mixing to balance background music and voice.
+*   🎞️ **CapCut-Style Visuals:** Programmatic FFmpeg pipelines for dynamic visual transitions.
+
+### 🎨 UI/UX
+*   ✨ **Premium Dashboard:** High-fidelity scalable frontend with glassmorphism.
+*   🌓 **Dynamic Theming:** Seamless switching between light and dark modes.
+
+---
+
+## 📺 Demo
 
 | Home Dashboard | Video Generation | Image Gallery |
 | :---: | :---: | :---: |
-| ![Homepage](Screenshot%20Website/Homepage.jpeg) | ![Reel Created](Screenshot%20Website/Reel%20created.jpeg) | ![Reel Gallery](Screenshot%20Website/Reel%20Gallery.jpeg) |
+| <img src="Screenshot%20Website/Homepage.jpeg" alt="Homepage" width="100%" /> | <img src="Screenshot%20Website/Reel%20created.jpeg" alt="Reel Created" width="100%" /> | <img src="Screenshot%20Website/Reel%20Gallery.jpeg" alt="Reel Gallery" width="100%" /> |
 | **Workspace Overview** | **Automated Pipeline** | **Content Management** |
 
-*Also featuring beautifully crafted [About](templates/about.html) and [Features](templates/features.html) pages with complete cross-platform responsiveness.*
+---
+
+## 🔄 Website Workflow
+
+1. **Upload & Prompt:** Provide a topic/text prompt, and drop your base images into the intuitive creator dashboard.
+2. **AI Generation & Processing:** The engine automatically synthesizes neural speech, calculates Whisper subtitle timings, and maps beat-synced transitions.
+3. **Video Compositing:** Watch as FFmpeg seamlessly multiplexes voice, music, generated subtitles, and visual effects in the background.
+4. **Export & Share:** Instantly preview and download your high-converting, professional MP4 directly from the integrated Gallery.
 
 ---
 
-## ✨ Premium AI Features
+## 🏗️ Architecture
 
-VidSnapAI has evolved into a sophisticated AI editing suite:
-
-*   🎙️ **Neural Voice Synthesis:** Deep generative speech integration powered by the **ElevenLabs API**, outputting ultra-realistic, studio-quality voiceovers.
-*   🖋️ **Whisper Word-Sync Subtitles:** Automated transcription and captioning via **OpenAI Whisper**. Includes highlight pops and perfect alignment in social-safe zones.
-*   🥁 **Beat-Synced Transitions:** Intelligent audio analysis (Python-based) that matches visual cuts and effects to the rhythm of your background music.
-*   🔊 **Intelligent Audio Ducking:** Professional sound mixing that automatically lowers background music volume when the AI narrator is speaking.
-*   🎞️ **CapCut-Style Visuals:** Programmatic FFmpeg pipelines handling zooms, pans, transitions, and overlays for maximum viewer retention.
-*   🎨 **Premium UI/UX System:** High-fidelity scalable frontend featuring glassmorphism, fluid micro-animations, and dynamic theme switching (Midnight Crimson / Warm Vanilla).
+1. **Ingestion:** Frontend sends generation requests and media to the Flask API.
+2. **Text-to-Speech:** Text payload is synthesized into neural speech via API.
+3. **Transcription:** Audio is processed for accurate, word-synced subtitles.
+4. **Beat-Sync:** Background music is analyzed for optimal visual transition points.
+5. **Compositing:** Voice, music, media, and subtitles are multiplexed into an `.mp4` file.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
-| Architecture Layer | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Backend Framework** | `Flask (Python)` | Core application logic, routing, and HTTP orchestration. |
-| **Video Engine** | `FFmpeg (Modular)` | Deterministic video composition, encoding, and filter chains. |
-| **Transcription AI** | `OpenAI Whisper` | Neural speech-to-text for precise caption timing. |
-| **Audio Intelligence** | `Librosa / Numpy` | Onset detection for beat-synchronization and ducking. |
-| **AI Integration** | `ElevenLabs / Edge` | State-of-the-art Generative Text-to-Speech synthesis. |
-| **Frontend Styling** | `HTML5 / Vanilla CSS` | Modern glassmorphism system with flexbox grids. |
-
----
-
-## 🏗️ System Architecture
-
-VidSnapAI employs a modular pipeline architecture for high-quality rendering:
-
-1.  **Ingestion:** The frontend transmits prompt and media payloads to the Flask API.
-2.  **Voice Generation:** The text payload is dispatched to the `text_to_audio` module for neural synthesis.
-3.  **Intelligence Pipeline:** 
-    - **Whisper Worker:** Transcribes generated audio into timed chunks for subtitles.
-    - **Beat-Sync Worker:** Analyzes background music for optimal transition points.
-4.  **FFmpeg Compositor:** The `video_processing` module multiplexes Voice, Music, Images, and Subtitles into a final `.mp4` container.
-5.  **Delivery Interface:** The asset is delivered to the gallery dashboard asynchronously.
+| Tool | Purpose |
+| :--- | :--- |
+| **Flask** | Backend API & Orchestration |
+| **FFmpeg** | Video compositing & processing |
+| **Whisper** | AI Subtitle Generation |
+| **ElevenLabs** | Neural Text-to-Speech |
 
 ---
 
@@ -75,73 +83,49 @@ VidSnapAI employs a modular pipeline architecture for high-quality rendering:
 
 ```bash
 VidSnapAI/
-├── main.py                 # Core routing & application entry
-├── generate_process.py     # Background worker & worker queue processor
-├── text_to_audio.py        # ElevenLabs neural speech API abstractor
-├── config.py               # Environment credentials
-├── pipeline/               # 🚀 The AI Editing Engine 
-│   ├── audio_processing.py # Ducking, fades, EQ mixing
-│   ├── video_processing.py # Combiner and filter-chain mapping
-│   ├── transitions.py      # Zooms, Xfades, Grading filters
-│   ├── beat_sync.py        # Beat detection & temporal scaling
-│   └── whisper_subtitles.py# ML-based word-sync generation
-├── static/                 # Styles, Fonts, and Exported Reels
-└── templates/              # Jinja2 layout engine views
+├── main.py                 # Application entry point
+├── generate_process.py     # Background worker logic
+├── text_to_audio.py        # Speech generation interface
+├── config.py               # Environment configuration
+├── pipeline/               # Core AI editing engine modules
+├── static/                 # Frontend assets (CSS, JS, Media)
+└── templates/              # Jinja2 HTML templates
 ```
 
 ---
 
-## ⚙️ Installation & Setup
-
-VidSnapAI is designed for rapid deployment. Follow these steps to initialize the services.
+## 🚀 Installation
 
 ### Prerequisites
-*   **Python:** Version 3.8 or higher.
-*   **FFmpeg:** Core library installed and globally bound to your OS Path.
-*   **ElevenLabs:** Valid API key (configure in `config.py`).
+*   Python 3.8+
+*   FFmpeg explicitly installed and added to PATH
+*   ElevenLabs API Key
 
-### Start Environment
-
-**1. Clone the repository**
+### Setup
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Piyu242005/VidSnapAI.git
 cd VidSnapAI
-```
 
-**2. Initialize virtual environment**
-```bash
+# 2. Setup virtual environment
 python -m venv .venv
+source .venv/bin/activate  # Or .\venv\Scripts\activate on Windows
 
-# Windows activation
-.\.venv\Scripts\activate
-# Linux/MacOS activation
-source .venv/bin/activate
-```
-
-**3. Install dependencies**
-```bash
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-**4. Run Application (Two Terminals)**
-Terminal A: `python main.py`  
-Terminal B: `python generate_process.py`
+# 4. Run application (Requires 2 terminals)
+# Terminal 1:
+python main.py
+# Terminal 2:
+python generate_process.py
+```
 
 ---
 
 ## 👨‍💻 Author
 
-**Piyush Ramteke**  
-*Data Scientist & Full Stack Developer*  
-Architecting AI applications with premium SaaS interfaces.  
+**Piyush Ramteke**
+Data Scientist | AI Developer
 
-[<img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Profile"/>](https://github.com/Piyu242005)
-
----
-
-<div align="center">
-
-*Distributed under the [MIT License](LICENSE.md).*  
-**Next-gen automation for the modern creator.**
-
-</div>
+[GitHub Profile](https://github.com/Piyu242005)
