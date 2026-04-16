@@ -1,79 +1,48 @@
-# 📜 Code of Conduct
+Based on the project's setup, here is a step-by-step run guide tailored for your Windows machine.
 
-## 🤝 Our Commitment
+### Prerequisites Check
+Before running the application, make sure you have **FFmpeg** installed and added to your system's PATH. The app relies on it heavily for video processing. Also, your ElevenLabs API key is already configured in the `.env` file!
 
-We are committed to providing a welcoming, inclusive, and respectful environment for everyone.
-Contributors, users, and maintainers of **VidSnapAI** are expected to follow this Code of Conduct.
+### Step 1: Initial Setup
+You'll need to set up your virtual environment and install the required dependencies. Open a terminal (like PowerShell) and run the following commands:
 
----
+```powershell
+# Navigate to the project directory
+cd c:\Users\Piyu\Downloads\VidSnapAI-Piyu24
 
-## 🌍 Our Standards
+# Set up the virtual environment (if you haven't already and the .venv directory is incomplete)
+python -m venv .venv
 
-### ✅ Expected Behavior
+# Activate the virtual environment
+.\.venv\Scripts\activate
 
-* Be respectful and considerate
-* Use inclusive and welcoming language
-* Accept constructive feedback gracefully
-* Focus on what is best for the community
-* Help others and collaborate positively
+# Install the necessary Python packages
+pip install -r requirements.txt
+```
 
----
+### Step 2: Start the Web Server (Terminal 1)
+Leave your first terminal open and running this command to start the main Flask API orchestrator:
 
-### ❌ Unacceptable Behavior
+```powershell
+# Make sure your virtual environment is still activated
+python main.py
+```
 
-* Harassment, discrimination, or offensive comments
-* Personal attacks or trolling
-* Spamming or self-promotion without value
-* Sharing private information without permission
-* Any behavior that creates a hostile environment
+### Step 3: Start the Background Worker (Terminal 2)
+You need a second terminal to run the process that actually handles the background video generation:
 
----
+1. Open a **new** terminal window or tab.
+2. Run the following commands:
 
-## ⚖️ Enforcement
+```powershell
+# Navigate to the project folder again
+cd c:\Users\Piyu\Downloads\VidSnapAI-Piyu24
 
-Project maintainers are responsible for enforcing this Code of Conduct.
-They may remove, edit, or reject contributions that do not align with these standards.
+# Activate the virtual environment in this new terminal
+.\.venv\Scripts\activate
 
-Repeated violations may result in:
+# Run the background worker
+python generate_process.py
+```
 
-* Warning
-* Temporary restriction
-* Permanent ban from the project
-
----
-
-## 🚨 Reporting Issues
-
-If you experience or witness unacceptable behavior:
-
-* Open an issue in the repository
-* Or contact the maintainer directly
-
-All reports will be handled confidentially and respectfully.
-
----
-
-## 👨‍💻 Maintainer
-
-**Piyush Ramteke**
-Data Scientist & Full Stack Developer
-
----
-
-## 📌 Scope
-
-This Code of Conduct applies to:
-
-* GitHub repository interactions
-* Issues, pull requests, and discussions
-* Any official project communication channels
-
----
-
-## 📄 Acknowledgement
-
-By participating in this project, you agree to follow this Code of Conduct.
-
----
-
-⭐ Thank you for helping make this project respectful and collaborative!
+Once both scripts are running, you can open your web browser to the default Flask URL (typically `http://127.0.0.1:5000`) and the `VidSnapAI` dashboard will be ready to process requests!
