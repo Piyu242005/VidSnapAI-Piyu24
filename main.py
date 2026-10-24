@@ -381,10 +381,6 @@ def _create_local_reel(myid):
 return render_template("create.html", myid=myid)
 
 
-return render_template("create.html", myid=myid)
-
-
-
 
 @app.route("/gallery")
 def gallery():
