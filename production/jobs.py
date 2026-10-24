@@ -6,7 +6,6 @@ Workers poll claim_next_job(); PostgreSQL row locks prevent duplicate claims.
 from __future__ import annotations
 
 import json
-import os
 import uuid
 from datetime import datetime, timedelta, timezone
 
