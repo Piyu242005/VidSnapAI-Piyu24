@@ -2,7 +2,7 @@
 
 # 🎬 VidSnapAI
 
-**Production-Ready AI-Powered Video Generation Engine**
+**AI-assisted short-form video generation project**
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -19,24 +19,24 @@
 
 ## 💡 Product Overview
 
-VidSnapAI is a premium, AI-driven platform for automating the creation of high-impact short-form video content like Instagram Reels, TikToks, and YouTube Shorts. It's built for developers and content creators who need to generate professional videos at scale using intelligent transcription, dynamic transitions, and high-quality synthetic voice.
+VidSnapAI is a Flask-based project that combines text-to-speech, subtitle generation, and FFmpeg video compositing to create short-form videos from user-supplied text and images. Performance, output quality, concurrency, and deployment readiness depend on the local environment and external AI services; these have not yet been benchmarked as production service guarantees.
 
 ---
 
 ## ✨ Features
 
 ### 🧠 AI Features
-*   🎙️ **Neural Voice Synthesis:** Studio-quality voiceovers powered by the ElevenLabs API.
-*   🖋️ **Whisper Subtitles:** Automated word-sync transcription with OpenAI Whisper.
+*   🎙️ **Text-to-Speech:** Voiceovers generated through the ElevenLabs API when a valid API key is configured.
+*   🖋️ **Automatic Subtitles:** Subtitle timing generated through the project's Whisper pipeline.
 
 ### 🎬 Video Processing
-*   🥁 **Beat-Synced Transitions:** Intelligent audio analysis matching cuts to background music.
-*   🔊 **Audio Ducking:** Professional sound mixing to balance background music and voice.
-*   🎞️ **CapCut-Style Visuals:** Programmatic FFmpeg pipelines for dynamic visual transitions.
+*   🥁 **Beat-Sync Processing:** Music-beat analysis can inform image durations in the video pipeline.
+*   🔊 **Audio Mixing:** Background music and narration are combined by the video processing pipeline; verify results with your own sample files.
+*   🎞️ **FFmpeg Compositing:** Programmatic video assembly with the transition options implemented in the project.
 
 ### 🎨 UI/UX
-*   ✨ **Premium Dashboard:** High-fidelity scalable frontend with glassmorphism.
-*   🌓 **Dynamic Theming:** Seamless switching between light and dark modes.
+*   ✨ **Web Interface:** Browser-based upload, generation, and gallery pages.
+*   🌓 **Theme Controls:** Light/dark theme styling is included in the frontend.
 
 ---
 
@@ -54,7 +54,7 @@ VidSnapAI is a premium, AI-driven platform for automating the creation of high-i
 1. **Upload & Prompt:** Provide a topic/text prompt, and drop your base images into the intuitive creator dashboard.
 2. **AI Generation & Processing:** The engine automatically synthesizes neural speech, calculates Whisper subtitle timings, and maps beat-synced transitions.
 3. **Video Compositing:** Watch as FFmpeg seamlessly multiplexes voice, music, generated subtitles, and visual effects in the background.
-4. **Export & Share:** Instantly preview and download your high-converting, professional MP4 directly from the integrated Gallery.
+4. **Export & Share:** Preview and download the generated MP4 from the integrated Gallery.
 
 ---
 
@@ -83,6 +83,29 @@ VidSnapAI is a premium, AI-driven platform for automating the creation of high-i
 
 ---
 
+## 🔐 Security Notes
+
+- Never commit `.env` files or API credentials. Use `.env.example` as a blank template and set `ELEVENLABS_API_KEY` locally or in the deployment secret store.
+- If a key was ever committed, revoke/rotate it with the provider immediately. Removing the file in a later commit does not remove it from Git history; rewrite history if needed and coordinate the force-push carefully.
+- The development server is bound to `127.0.0.1` by default. Do not expose Flask's built-in server to the public internet.
+- Upload checks include extension and basic file-content validation, plus request and field limits. They are not a substitute for sandboxed media decoding, malware scanning, authentication/authorization, CSRF protection, per-user quotas, and resource limits.
+- Generation still has synchronous work in the web request path. Use a durable queue/worker design before accepting untrusted public traffic.
+
+## 🚧 Production-readiness status
+
+This repository is an active project, not a certified or audited production service. Authentication and authorization, CSRF protections, durable background jobs, concurrency/load testing, secure media sandboxing, monitoring, and deployment-specific hardening still require implementation and verification. Do not use it to process sensitive uploads or expose it publicly without completing those controls.
+
+## 🧪 Validation
+
+Run a syntax check before launching:
+
+```bash
+python -m compileall -q main.py generate_process.py text_to_audio.py config.py pipeline security_utils.py
+python -m unittest discover -v
+```
+
+A full end-to-end test requires FFmpeg, the Whisper dependencies/model, and a valid ElevenLabs API key. CI compile/unit checks do not verify external AI providers, long-running render jobs, concurrent workloads, or production deployment.
+
 ## 📁 Project Structure
 
 ```bash
@@ -108,8 +131,8 @@ VidSnapAI/
 ### Setup
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Piyu242005/VidSnapAI.git
-cd VidSnapAI
+git clone https://github.com/Piyu242005/VidSnapAI-Piyu24.git
+cd VidSnapAI-Piyu24
 
 # 2. Setup virtual environment
 python -m venv .venv
@@ -117,6 +140,9 @@ source .venv/bin/activate  # Or .\venv\Scripts\activate on Windows
 
 # 3. Install dependencies
 pip install -r requirements.txt
+
+# 3b. Create local environment config (fill in your own API key; never commit it)
+# Copy .env.example to .env, then edit .env
 
 # 4. Run application (Requires 2 terminals)
 # Terminal 1:

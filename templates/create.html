@@ -55,6 +55,7 @@
             <p class="upload-instructions">Drag & drop images or click to browse. Upload multiple images to create an amazing reel.</p>
             
             <form action="/create" enctype="multipart/form-data" method="post" id="createForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input name="uuid" type="hidden" value="{{myid}}">
                 
                 <!-- Drag & Drop Zone -->
