@@ -9,7 +9,6 @@ import logging
 import os
 import tempfile
 import time
-import traceback
 from pathlib import Path
 
 from main import app, db
