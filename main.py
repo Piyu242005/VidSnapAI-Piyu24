@@ -391,7 +391,7 @@ def delete_reel(reel_id):
             return jsonify({'success': True, 'message': 'Reel deleted successfully'})
         else:
             return jsonify({'error': 'Reel not found'}), 404
-    except Exception as e:
+    except Exception:
         logger.exception("Reel deletion failed")
         db.session.rollback()
         return jsonify({"error": "Unable to delete reel."}), 500
