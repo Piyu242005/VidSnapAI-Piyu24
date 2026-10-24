@@ -176,3 +176,30 @@ Data Scientist | AI Developer
   </p>
   <p align="center">© VidSnapAI · Open-source project under the MIT License</p>
 </footer>
+
+---
+
+## 🏗️ Phase 1: durable generation foundation
+
+The Phase 1 branch introduces the first infrastructure building blocks for moving media work out of Vercel serverless functions:
+
+- A PostgreSQL-backed job model with status, progress, retry count, idempotency key, and output metadata.
+- Local development and optional S3-compatible object-storage adapters with short-lived signed upload/download URL helpers.
+- A persistent worker entry point and a Docker image with FFmpeg and Linux fonts.
+- Versioned job creation, status, and download API endpoints. These endpoints require a server-established user identity; this repository does **not** yet include a complete authentication provider, so anonymous job access is denied.
+- Local path/configuration refactoring and a portable font selection for video rendering.
+
+### Current status and limitations
+
+This is an implementation-in-progress branch, not a verified production release. The end-to-end worker pipeline, external PostgreSQL, object-storage credentials, authentication integration, schema migrations, and live deployment still need verification before asynchronous generation is enabled. Vercel continues to serve the web preview; online video generation remains disabled until those prerequisites are configured.
+
+### Worker deployment
+
+Build the worker image with:
+
+```bash
+docker build -f Dockerfile.worker -t vidsnapai-worker .
+docker run --rm --env-file .env vidsnapai-worker
+```
+
+Use a private staging database and storage bucket for testing. Do not put provider credentials in source control. For production, configure `DATABASE_URL`, `STORAGE_BACKEND=s3`, storage endpoint/bucket/credentials, `ELEVENLABS_API_KEY`, and a stable `FLASK_SECRET_KEY` in the appropriate hosting secret managers. Apply database schema migrations through a controlled deployment step before starting the worker.

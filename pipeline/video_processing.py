@@ -1,5 +1,6 @@
 import subprocess
 import os
+from pathlib import Path
 from .audio_processing import process_audio
 from .transitions import build_transition_complex_filter
 from .subtitles import generate_subtitles_filter
@@ -42,7 +43,9 @@ def create_premium_reel(folder_path, images_data, text_timing_data, settings):
     
     # 3. Apply Subtitles
     overlay_font = settings.get('overlay_font', 'Arial')
-    font_path = f"C:/Windows/Fonts/{overlay_font}.ttf"
+    configured_font = os.getenv("VIDSNAPAI_FONT_PATH")
+    candidates = [configured_font, "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf", f"C:/Windows/Fonts/{overlay_font}.ttf"]
+    font_path = next((candidate for candidate in candidates if candidate and Path(candidate).is_file()), "")
     
     subtitles_str = generate_subtitles_filter(text_timing_data, font_path)
     
@@ -66,7 +69,7 @@ def create_premium_reel(folder_path, images_data, text_timing_data, settings):
     )
     
     print("Compiling Reel with CapCut Editing Engine...")
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=int(os.getenv("FFMPEG_TIMEOUT_SECONDS", "1800")))
     if result.returncode != 0:
         raise Exception(f"FFmpeg pipeline fail: {result.stderr}")
     

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, g, session
 import uuid
 from werkzeug.utils import secure_filename
 import os
@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
+from production.jobs import create_job_model, enqueue_job, init_jobs
+from production.storage import storage_from_env, StorageConfigurationError
 
 # Load environment variables before service configuration is read.
 load_dotenv()
@@ -65,6 +67,8 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
+init_jobs(db)
+VideoJob = create_job_model(db)
 
 # Validate critical environment variables
 if not os.getenv("ELEVENLABS_API_KEY"):
@@ -130,9 +134,7 @@ class Reel(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
-# Create all tables on startup
-with app.app_context():
-    db.create_all()
+# Schema changes are applied by a controlled migration command, not app import.
 
 # Helper for old metadata structure mapping
 def update_reel_stats(reel_id, stat_type='view'):
@@ -152,149 +154,230 @@ def home():
 @app.route("/create", methods=["GET", "POST"])
 def create():
     myid = uuid.uuid4()
-    if request.method == "POST":
-        if VERCEL_RUNTIME:
-            return render_template("create.html", myid=myid, success=False, error_message="Video generation is disabled on Vercel serverless. Deploy the media worker separately and connect durable storage and a job queue."), 503
-        rec_id = (request.form.get("uuid") or "").strip()
-        desc = (request.form.get("text") or "").strip()
+    if request.method == "GET":
+        return render_template("create.html", myid=myid)
+    if VERCEL_RUNTIME:
+        # Keep the current UI closed until authenticated async processing is configured.
+        return render_template("create.html", myid=myid, success=False,
+            error_message="Online generation is not enabled until authentication, PostgreSQL, object storage and the persistent worker are configured."), 503
+    return _create_local_reel(myid)
 
-        # Reject malformed identifiers and empty/oversized prompts before touching the filesystem.
-        if not is_valid_upload_id(rec_id):
-            return "Invalid generation ID.", 400
-        if not desc or len(desc) > MAX_TEXT_LENGTH:
-            return f"Text must contain 1 to {MAX_TEXT_LENGTH} characters.", 400
-        try:
-            voice_id = (request.form.get("voice_id") or DEFAULT_VOICE_ID).strip()
-            voice_speed = parse_bounded_number(request.form.get("voice_speed", "1.0"), 0.5, 2.0, "voice speed")
-            music_volume = int(parse_bounded_number(request.form.get("music_volume", "50"), 0, 100, "music volume"))
-            overlay_size = int(parse_bounded_number(request.form.get("overlay_size", "40"), 20, 100, "overlay size"))
-        except ValueError as exc:
-            return str(exc), 400
-        music_file = request.form.get("music_file", "").strip()
-        overlay_text = (request.form.get("overlay_text") or "")[:300]
-        overlay_position = request.form.get("overlay_position", "bottom")
-        overlay_color = request.form.get("overlay_color", "#ffffff")
-        overlay_font = request.form.get("overlay_font", "Arial")
-        aspect_ratio = request.form.get("aspect_ratio", "9:16")
-        quality = request.form.get("quality", "1080p")
-        transition = request.form.get("transition", "none")
-        if aspect_ratio not in ALLOWED_ASPECT_RATIOS or quality not in ALLOWED_QUALITIES or transition not in ALLOWED_TRANSITIONS:
-            return "Invalid video export option.", 400
-        if overlay_position not in {"top", "center", "bottom"} or overlay_font not in {"Arial", "Helvetica", "Times", "Courier"}:
-            return "Invalid overlay option.", 400
-        if not voice_id or len(voice_id) > 100:
-            return "Invalid voice ID.", 400
-        
-        input_files = []
-        durations = {}
-        
-        upload_dir = os.path.join(app.config["UPLOAD_FOLDER"], rec_id)
-        os.makedirs(upload_dir, exist_ok=False)
-        
-        # Capture the description and save it to a file
-        with open(os.path.join(upload_dir, "desc.txt"), "w", encoding="utf-8") as f:
-            f.write(desc)
-        
-        # Save settings
-        settings = {
-            'voice_id': voice_id,
-            'voice_speed': voice_speed,
-            'music_file': music_file,
-            'music_volume': music_volume,
-            'overlay_text': overlay_text,
-            'overlay_position': overlay_position,
-            'overlay_color': overlay_color,
-            'overlay_font': overlay_font,
-            'overlay_size': overlay_size,
-            'aspect_ratio': aspect_ratio,
-            'quality': quality,
-            'transition': transition
-        }
-        
-        with open(os.path.join(upload_dir, "settings.json"), "w", encoding="utf-8") as f:
-            json.dump(settings, f, indent=2)
-        
-        # Handle file uploads
-        for key, value in request.files.items():
-            if key.startswith('file') and value.filename:
-                file = request.files[key]
-                if not has_allowed_extension(file.filename, ALLOWED_EXTENSIONS):
-                    return "Unsupported image type. Use PNG or JPEG files.", 400
-                filename = secure_filename(file.filename)
-                if not filename:
-                    return "Invalid upload filename.", 400
-                if filename in {"desc.txt", "settings.json", "input.txt", "audio.mp3"}:
-                    filename = f"image_{len(input_files) + 1}.{filename.rsplit('.', 1)[-1].lower()}"
-                target = os.path.join(upload_dir, filename)
-                file.save(target)
-                if not _looks_like_image(target):
-                    os.remove(target)
-                    return "Uploaded file content is not a valid supported image.", 400
-                input_files.append(filename)
-                
-                # Get duration if provided
-                duration_key = key.replace('file', 'duration')
-                try:
-                    duration = parse_bounded_number(request.form.get(duration_key, "1.0"), 0.25, 30.0, "image duration")
-                except ValueError as exc:
-                    return str(exc), 400
-                durations[filename] = duration
-        
-        # Handle custom music upload
-        custom_music = request.files.get('custom_music')
-        if custom_music and custom_music.filename:
-            if not has_allowed_extension(custom_music.filename, ALLOWED_MUSIC_EXTENSIONS):
-                return "Unsupported music type. Use MP3, WAV, M4A, AAC, or OGG.", 400
-            music_filename = secure_filename(custom_music.filename)
-            if not music_filename:
-                return "Invalid music filename.", 400
-            if music_filename in {"desc.txt", "settings.json", "input.txt", "audio.mp3"} or music_filename in input_files:
-                music_filename = f"custom_music.{music_filename.rsplit('.', 1)[-1].lower()}"
-            music_path = os.path.join(upload_dir, music_filename)
-            custom_music.save(music_path)
-            if not _looks_like_audio(music_path):
-                os.remove(music_path)
-                return "Uploaded file content is not a valid supported audio file.", 400
-            settings['music_file'] = music_filename
-            settings['custom_music'] = True
-        
-        # Create input.txt with durations
-        with open(os.path.join(upload_dir, "input.txt"), "w", encoding="utf-8") as f:
-            for fl in input_files:
-                full_path = os.path.abspath(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, fl)).replace('\\', '/')
-                duration = durations.get(fl, 1.0)
-                f.write(f"file '{full_path.replace(chr(39), chr(39) + chr(92) + chr(39) + chr(39))}'\nduration {duration}\n")
 
-        # Generate audio and reel synchronously
-        try:
-            # Import here to avoid circular imports
-            from text_to_audio import text_to_speech_file
-            text_to_speech_file(desc, rec_id, voice_id=voice_id, speed=voice_speed)
-            from generate_process import create_reel
-            create_reel(rec_id, settings=settings)
+def _request_user_id():
+    """Use a server-established identity; never trust user_id from request JSON."""
+    user_id = getattr(g, "user_id", None) or session.get("user_id")
+    return str(user_id) if user_id else None
+
+
+@app.route("/api/v1/jobs", methods=["POST"])
+def create_job_api():
+    """Create an async job, protected by authentication and strict manifest validation."""
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+    if not request.is_json:
+        return jsonify({"error": "expected_json"}), 415
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"error": "invalid_request"}), 400
+    manifest = payload.get("manifest")
+    if not isinstance(manifest, dict):
+        return jsonify({"error": "invalid_manifest"}), 400
+    text = manifest.get("text")
+    inputs = manifest.get("inputs")
+    if not isinstance(text, str) or not text.strip() or len(text) > MAX_TEXT_LENGTH:
+        return jsonify({"error": "invalid_text"}), 400
+    if not isinstance(inputs, list) or not inputs or len(inputs) > 30:
+        return jsonify({"error": "invalid_inputs"}), 400
+    for entry in inputs:
+        if not isinstance(entry, dict) or not isinstance(entry.get("key"), str):
+            return jsonify({"error": "invalid_input_manifest"}), 400
+        key = entry["key"]
+        if key.startswith("/") or "\\" in key or ".." in key.split("/"):
+            return jsonify({"error": "invalid_input_key"}), 400
+    idem = request.headers.get("Idempotency-Key", "")
+    if len(idem) > 128:
+        return jsonify({"error": "invalid_idempotency_key"}), 400
+    try:
+        job, created = enqueue_job(VideoJob, user_id, manifest, idem or None)
+        return jsonify({"job_id": job.id, "status": job.status}), (202 if created else 200)
+    except Exception:
+        db.session.rollback()
+        logger.exception("Job submission failed")
+        return jsonify({"error": "job_submission_failed"}), 500
+
+
+@app.route("/api/v1/jobs/<job_id>", methods=["GET"])
+def get_job_api(job_id):
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+    job = VideoJob.query.filter_by(id=job_id, user_id=user_id).first()
+    if not job:
+        return jsonify({"error": "job_not_found"}), 404
+    return jsonify(job.public_dict())
+
+
+@app.route("/api/v1/jobs/<job_id>/download", methods=["GET"])
+def download_job_api(job_id):
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+    job = VideoJob.query.filter_by(id=job_id, user_id=user_id).first()
+    if not job:
+        return jsonify({"error": "job_not_found"}), 404
+    if job.status != "succeeded" or not job.output_key:
+        return jsonify({"error": "job_not_complete"}), 409
+    try:
+        storage = storage_from_env()
+        if not hasattr(storage, "presign_download"):
+            return jsonify({"error": "signed_download_unavailable"}), 503
+        return jsonify({"download_url": storage.presign_download(job.output_key, 180), "expires_in": 180})
+    except StorageConfigurationError:
+        return jsonify({"error": "storage_not_configured"}), 503
+
+
+def _create_local_reel(myid):
+    # Legacy local synchronous pipeline retained for backwards-compatible development.
+    rec_id = (request.form.get("uuid") or "").strip()
+    desc = (request.form.get("text") or "").strip()
+
+    # Reject malformed identifiers and empty/oversized prompts before touching the filesystem.
+    if not is_valid_upload_id(rec_id):
+        return "Invalid generation ID.", 400
+    if not desc or len(desc) > MAX_TEXT_LENGTH:
+        return f"Text must contain 1 to {MAX_TEXT_LENGTH} characters.", 400
+    try:
+        voice_id = (request.form.get("voice_id") or DEFAULT_VOICE_ID).strip()
+        voice_speed = parse_bounded_number(request.form.get("voice_speed", "1.0"), 0.5, 2.0, "voice speed")
+        music_volume = int(parse_bounded_number(request.form.get("music_volume", "50"), 0, 100, "music volume"))
+        overlay_size = int(parse_bounded_number(request.form.get("overlay_size", "40"), 20, 100, "overlay size"))
+    except ValueError as exc:
+        return str(exc), 400
+    music_file = request.form.get("music_file", "").strip()
+    overlay_text = (request.form.get("overlay_text") or "")[:300]
+    overlay_position = request.form.get("overlay_position", "bottom")
+    overlay_color = request.form.get("overlay_color", "#ffffff")
+    overlay_font = request.form.get("overlay_font", "Arial")
+    aspect_ratio = request.form.get("aspect_ratio", "9:16")
+    quality = request.form.get("quality", "1080p")
+    transition = request.form.get("transition", "none")
+    if aspect_ratio not in ALLOWED_ASPECT_RATIOS or quality not in ALLOWED_QUALITIES or transition not in ALLOWED_TRANSITIONS:
+        return "Invalid video export option.", 400
+    if overlay_position not in {"top", "center", "bottom"} or overlay_font not in {"Arial", "Helvetica", "Times", "Courier"}:
+        return "Invalid overlay option.", 400
+    if not voice_id or len(voice_id) > 100:
+        return "Invalid voice ID.", 400
+    
+    input_files = []
+    durations = {}
+    
+    upload_dir = os.path.join(app.config["UPLOAD_FOLDER"], rec_id)
+    os.makedirs(upload_dir, exist_ok=False)
+    
+    # Capture the description and save it to a file
+    with open(os.path.join(upload_dir, "desc.txt"), "w", encoding="utf-8") as f:
+        f.write(desc)
+    
+    # Save settings
+    settings = {
+        'voice_id': voice_id,
+        'voice_speed': voice_speed,
+        'music_file': music_file,
+        'music_volume': music_volume,
+        'overlay_text': overlay_text,
+        'overlay_position': overlay_position,
+        'overlay_color': overlay_color,
+        'overlay_font': overlay_font,
+        'overlay_size': overlay_size,
+        'aspect_ratio': aspect_ratio,
+        'quality': quality,
+        'transition': transition
+    }
+    
+    with open(os.path.join(upload_dir, "settings.json"), "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2)
+    
+    # Handle file uploads
+    for key, value in request.files.items():
+        if key.startswith('file') and value.filename:
+            file = request.files[key]
+            if not has_allowed_extension(file.filename, ALLOWED_EXTENSIONS):
+                return "Unsupported image type. Use PNG or JPEG files.", 400
+            filename = secure_filename(file.filename)
+            if not filename:
+                return "Invalid upload filename.", 400
+            if filename in {"desc.txt", "settings.json", "input.txt", "audio.mp3"}:
+                filename = f"image_{len(input_files) + 1}.{filename.rsplit('.', 1)[-1].lower()}"
+            target = os.path.join(upload_dir, filename)
+            file.save(target)
+            if not _looks_like_image(target):
+                os.remove(target)
+                return "Uploaded file content is not a valid supported image.", 400
+            input_files.append(filename)
             
-            # Save metadata to database
-            new_reel = Reel(
-                id=rec_id,
-                text=desc,
-                voice_id=voice_id,
-                music_file=settings.get('music_file', ''),
-                settings=json.dumps(settings)
-            )
-            db.session.add(new_reel)
-            db.session.commit()
-            
-            success = True
-            reel_filename = f"{rec_id}.mp4"
-            error_message = None
-        except Exception:
-            logger.exception("Reel generation failed for request %s", rec_id)
-            success = False
-            reel_filename = None
-            error_message = "Video generation failed. Check server logs and configuration, then try again."
-        return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename, error_message=error_message)
+            # Get duration if provided
+            duration_key = key.replace('file', 'duration')
+            try:
+                duration = parse_bounded_number(request.form.get(duration_key, "1.0"), 0.25, 30.0, "image duration")
+            except ValueError as exc:
+                return str(exc), 400
+            durations[filename] = duration
+    
+    # Handle custom music upload
+    custom_music = request.files.get('custom_music')
+    if custom_music and custom_music.filename:
+        if not has_allowed_extension(custom_music.filename, ALLOWED_MUSIC_EXTENSIONS):
+            return "Unsupported music type. Use MP3, WAV, M4A, AAC, or OGG.", 400
+        music_filename = secure_filename(custom_music.filename)
+        if not music_filename:
+            return "Invalid music filename.", 400
+        if music_filename in {"desc.txt", "settings.json", "input.txt", "audio.mp3"} or music_filename in input_files:
+            music_filename = f"custom_music.{music_filename.rsplit('.', 1)[-1].lower()}"
+        music_path = os.path.join(upload_dir, music_filename)
+        custom_music.save(music_path)
+        if not _looks_like_audio(music_path):
+            os.remove(music_path)
+            return "Uploaded file content is not a valid supported audio file.", 400
+        settings['music_file'] = music_filename
+        settings['custom_music'] = True
+    
+    # Create input.txt with durations
+    with open(os.path.join(upload_dir, "input.txt"), "w", encoding="utf-8") as f:
+        for fl in input_files:
+            full_path = os.path.abspath(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, fl)).replace('\\', '/')
+            duration = durations.get(fl, 1.0)
+            f.write(f"file '{full_path.replace(chr(39), chr(39) + chr(92) + chr(39) + chr(39))}'\nduration {duration}\n")
 
-    return render_template("create.html", myid=myid)
+    # Generate audio and reel synchronously
+    try:
+        # Import here to avoid circular imports
+        from text_to_audio import text_to_speech_file
+        text_to_speech_file(desc, rec_id, voice_id=voice_id, speed=voice_speed)
+        from generate_process import create_reel
+        create_reel(rec_id, settings=settings)
+        
+        # Save metadata to database
+        new_reel = Reel(
+            id=rec_id,
+            text=desc,
+            voice_id=voice_id,
+            music_file=settings.get('music_file', ''),
+            settings=json.dumps(settings)
+        )
+        db.session.add(new_reel)
+        db.session.commit()
+        
+        success = True
+        reel_filename = f"{rec_id}.mp4"
+        error_message = None
+    except Exception:
+        logger.exception("Reel generation failed for request %s", rec_id)
+        success = False
+        reel_filename = None
+        error_message = "Video generation failed. Check server logs and configuration, then try again."
+    return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename, error_message=error_message)
+
 
 @app.route("/gallery")
 def gallery():

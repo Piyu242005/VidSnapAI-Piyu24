@@ -9,12 +9,13 @@ from pipeline.whisper_subtitles import generate_srt
 from pipeline.beat_sync import detect_beats, apply_beat_sync_durations
 import urllib.parse
 
-def text_to_audio(folder):
+def text_to_audio(folder, upload_root=None):
+    upload_root = os.path.abspath(upload_root or os.getenv("UPLOAD_ROOT", "user_uploads"))
     print("TTA - ", folder)
-    with open(f"user_uploads/{folder}/desc.txt", encoding="utf-8") as f:
+    with open(os.path.join(upload_root, folder, "desc.txt"), encoding="utf-8") as f:
         text = f.read()
     print(text, folder)
-    tta_core(text, folder)
+    tta_core(text, folder, output_path=os.path.join(upload_root, folder, "audio.mp3"))
 
 def parse_input_txt(input_file, folder_dir):
     images_data = []
@@ -38,9 +39,11 @@ def parse_input_txt(input_file, folder_dir):
                 current_file = None
     return images_data
 
-def create_reel(folder, settings=None):
+def create_reel(folder, settings=None, upload_root=None, reels_root=None):
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    folder_dir = os.path.join(base_dir, f"user_uploads/{folder}")
+    upload_root = os.path.abspath(upload_root or os.getenv("UPLOAD_ROOT", os.path.join(base_dir, "user_uploads")))
+    reels_root = os.path.abspath(reels_root or os.path.join(base_dir, "static", "reels"))
+    folder_dir = os.path.join(upload_root, folder)
     
     if settings is None:
         settings_file = os.path.join(folder_dir, "settings.json")
@@ -101,8 +104,10 @@ def create_reel(folder, settings=None):
     
     output_tmp = create_premium_reel(folder_dir, images_data, text_timing_data, settings)
     
-    output_file_final = os.path.join(base_dir, f"static/reels/{folder}.mp4")
+    os.makedirs(reels_root, exist_ok=True)
+    output_file_final = os.path.join(reels_root, f"{folder}.mp4")
     shutil.move(output_tmp, output_file_final)
+    return output_file_final
     
     print("CR - ", folder)
 
@@ -113,27 +118,28 @@ if __name__ == '__main__':
 
     while True:
         try:
-            if not os.path.exists("user_uploads"):
-                os.makedirs("user_uploads", exist_ok=True)
+            upload_root = os.getenv("UPLOAD_ROOT", "user_uploads")
+            if not os.path.exists(upload_root):
+                os.makedirs(upload_root, exist_ok=True)
 
-            folders = [f for f in os.listdir("user_uploads") if os.path.isdir(os.path.join("user_uploads", f))]
+            folders = [f for f in os.listdir(upload_root) if os.path.isdir(os.path.join(upload_root, f))]
             for folder in folders:
                 if folder.startswith('temp_'):
                     continue
 
-                output_file = f"static/reels/{folder}.mp4"
+                output_file = os.path.join(os.getenv("REELS_ROOT", "static/reels"), f"{folder}.mp4")
                 if not os.path.exists(output_file):
-                    desc_file = f"user_uploads/{folder}/desc.txt"
-                    input_file = f"user_uploads/{folder}/input.txt"
+                    desc_file = os.path.join(upload_root, folder, "desc.txt")
+                    input_file = os.path.join(upload_root, folder, "input.txt")
 
                     if os.path.exists(desc_file) and os.path.exists(input_file):
                         print(f"Processing new folder: {folder}")
                         try:
-                            audio_file = f"user_uploads/{folder}/audio.mp3"
+                            audio_file = os.path.join(upload_root, folder, "audio.mp3")
                             if not os.path.exists(audio_file):
-                                text_to_audio(folder)
+                                text_to_audio(folder, upload_root=upload_root)
 
-                            create_reel(folder)
+                            create_reel(folder, upload_root=upload_root, reels_root=os.getenv("REELS_ROOT", "static/reels"))
                             print(f"Successfully processed: {folder}")
                         except Exception as e:
                             print(f"Error processing {folder}: {e}")
