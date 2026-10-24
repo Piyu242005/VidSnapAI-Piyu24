@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "main.py": {
-      "includeFiles": "{templates,static}/**",
+      "includeFiles": "{templates,static,production}/**",
       "maxDuration": 10
     }
   }
