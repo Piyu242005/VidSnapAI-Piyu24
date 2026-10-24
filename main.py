@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, g, session
 import uuid
 from werkzeug.utils import secure_filename
 import os
@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
+from production.jobs import create_job_model, enqueue_job, init_jobs
+from production.storage import storage_from_env, StorageConfigurationError
 
 # Load environment variables before service configuration is read.
 load_dotenv()
@@ -65,6 +67,8 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
+init_jobs(db)
+VideoJob = create_job_model(db)
 
 # Validate critical environment variables
 if not os.getenv("ELEVENLABS_API_KEY"):
@@ -130,9 +134,7 @@ class Reel(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
-# Create all tables on startup
-with app.app_context():
-    db.create_all()
+# Schema changes are applied by a controlled migration command, not app import.
 
 # Helper for old metadata structure mapping
 def update_reel_stats(reel_id, stat_type='view'):
@@ -152,9 +154,91 @@ def home():
 @app.route("/create", methods=["GET", "POST"])
 def create():
     myid = uuid.uuid4()
-    if request.method == "POST":
-        if VERCEL_RUNTIME:
-            return render_template("create.html", myid=myid, success=False, error_message="Video generation is disabled on Vercel serverless. Deploy the media worker separately and connect durable storage and a job queue."), 503
+    if request.method == "GET":
+        return render_template("create.html", myid=myid)
+    if VERCEL_RUNTIME:
+        # Keep the current UI closed until authenticated async processing is configured.
+        return render_template("create.html", myid=myid, success=False,
+            error_message="Online generation is not enabled until authentication, PostgreSQL, object storage and the persistent worker are configured."), 503
+    return _create_local_reel(myid)
+
+
+def _request_user_id():
+    """Use a server-established identity; never trust user_id from request JSON."""
+    user_id = getattr(g, "user_id", None) or session.get("user_id")
+    return str(user_id) if user_id else None
+
+
+@app.route("/api/v1/jobs", methods=["POST"])
+def create_job_api():
+    """Create an async job, protected by authentication and strict manifest validation."""
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+    if not request.is_json:
+        return jsonify({"error": "expected_json"}), 415
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"error": "invalid_request"}), 400
+    manifest = payload.get("manifest")
+    if not isinstance(manifest, dict):
+        return jsonify({"error": "invalid_manifest"}), 400
+    text = manifest.get("text")
+    inputs = manifest.get("inputs")
+    if not isinstance(text, str) or not text.strip() or len(text) > MAX_TEXT_LENGTH:
+        return jsonify({"error": "invalid_text"}), 400
+    if not isinstance(inputs, list) or not inputs or len(inputs) > 30:
+        return jsonify({"error": "invalid_inputs"}), 400
+    for entry in inputs:
+        if not isinstance(entry, dict) or not isinstance(entry.get("key"), str):
+            return jsonify({"error": "invalid_input_manifest"}), 400
+        key = entry["key"]
+        if key.startswith("/") or "\\" in key or ".." in key.split("/"):
+            return jsonify({"error": "invalid_input_key"}), 400
+    idem = request.headers.get("Idempotency-Key", "")
+    if len(idem) > 128:
+        return jsonify({"error": "invalid_idempotency_key"}), 400
+    try:
+        job, created = enqueue_job(VideoJob, user_id, manifest, idem or None)
+        return jsonify({"job_id": job.id, "status": job.status}), (202 if created else 200)
+    except Exception:
+        db.session.rollback()
+        logger.exception("Job submission failed")
+        return jsonify({"error": "job_submission_failed"}), 500
+
+
+@app.route("/api/v1/jobs/<job_id>", methods=["GET"])
+def get_job_api(job_id):
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+    job = VideoJob.query.filter_by(id=job_id, user_id=user_id).first()
+    if not job:
+        return jsonify({"error": "job_not_found"}), 404
+    return jsonify(job.public_dict())
+
+
+@app.route("/api/v1/jobs/<job_id>/download", methods=["GET"])
+def download_job_api(job_id):
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+    job = VideoJob.query.filter_by(id=job_id, user_id=user_id).first()
+    if not job:
+        return jsonify({"error": "job_not_found"}), 404
+    if job.status != "succeeded" or not job.output_key:
+        return jsonify({"error": "job_not_complete"}), 409
+    try:
+        storage = storage_from_env()
+        if not hasattr(storage, "presign_download"):
+            return jsonify({"error": "signed_download_unavailable"}), 503
+        return jsonify({"download_url": storage.presign_download(job.output_key, 180), "expires_in": 180})
+    except StorageConfigurationError:
+        return jsonify({"error": "storage_not_configured"}), 503
+
+
+def _create_local_reel(myid):
+    # Legacy local synchronous pipeline retained for backwards-compatible development.
         rec_id = (request.form.get("uuid") or "").strip()
         desc = (request.form.get("text") or "").strip()
 
@@ -295,6 +379,10 @@ def create():
         return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename, error_message=error_message)
 
     return render_template("create.html", myid=myid)
+
+
+    return render_template("create.html", myid=myid)
+
 
 @app.route("/gallery")
 def gallery():
