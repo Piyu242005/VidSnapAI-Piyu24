@@ -9,12 +9,13 @@ from pipeline.whisper_subtitles import generate_srt
 from pipeline.beat_sync import detect_beats, apply_beat_sync_durations
 import urllib.parse
 
-def text_to_audio(folder):
+def text_to_audio(folder, upload_root=None):
+    upload_root = os.path.abspath(upload_root or os.getenv("UPLOAD_ROOT", "user_uploads"))
     print("TTA - ", folder)
     with open(os.path.join(upload_root, folder, "desc.txt"), encoding="utf-8") as f:
         text = f.read()
     print(text, folder)
-    tta_core(text, folder)
+    tta_core(text, folder, output_path=os.path.join(upload_root, folder, "audio.mp3"))
 
 def parse_input_txt(input_file, folder_dir):
     images_data = []
@@ -128,7 +129,7 @@ if __name__ == '__main__':
 
                 output_file = os.path.join(os.getenv("REELS_ROOT", "static/reels"), f"{folder}.mp4")
                 if not os.path.exists(output_file):
-                    desc_file = f"user_uploads/{folder}/desc.txt"
+                    desc_file = os.path.join(upload_root, folder, "desc.txt")
                     input_file = os.path.join(upload_root, folder, "input.txt")
 
                     if os.path.exists(desc_file) and os.path.exists(input_file):
@@ -136,9 +137,9 @@ if __name__ == '__main__':
                         try:
                             audio_file = os.path.join(upload_root, folder, "audio.mp3")
                             if not os.path.exists(audio_file):
-                                text_to_audio(folder)
+                                text_to_audio(folder, upload_root=upload_root)
 
-                            create_reel(folder)
+                            create_reel(folder, upload_root=upload_root, reels_root=os.getenv("REELS_ROOT", "static/reels"))
                             print(f"Successfully processed: {folder}")
                         except Exception as e:
                             print(f"Error processing {folder}: {e}")
