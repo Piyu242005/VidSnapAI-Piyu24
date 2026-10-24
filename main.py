@@ -6,16 +6,15 @@ import json
 import logging
 import shutil
 from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
-
-# Load environment variables
-load_dotenv()
-
-from text_to_audio import text_to_speech_file as text_to_audio
 from generate_process import create_reel
+
+# Load environment variables before service configuration is read.
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_FOLDER = str(BASE_DIR / "user_uploads")
