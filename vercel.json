@@ -1,15 +1,9 @@
 {
   "version": 2,
   "functions": {
-    "api/index.py": {
+    "main.py": {
       "includeFiles": "{templates,static}/**",
       "maxDuration": 10
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/index"
-    }
-  ]
+  }
 }
