@@ -378,9 +378,6 @@ def _create_local_reel(myid):
         error_message = "Video generation failed. Check server logs and configuration, then try again."
     return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename, error_message=error_message)
 
-return render_template("create.html", myid=myid)
-
-
 
 @app.route("/gallery")
 def gallery():
