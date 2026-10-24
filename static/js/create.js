@@ -112,6 +112,7 @@ function initAudioPreview() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]')?.value || ''
                     },
                     body: JSON.stringify({
                         text: text,
@@ -237,6 +238,9 @@ function initFormSubmission() {
         try {
             const response = await fetch(form.action, {
                 method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]')?.value || ''
+                },
                 body: formData
             });
 
