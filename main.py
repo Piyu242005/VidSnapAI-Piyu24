@@ -8,6 +8,7 @@ import shutil
 from pathlib import Path
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
 
 # Load environment variables
@@ -53,6 +54,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
 # Validate critical environment variables
 if not os.getenv("ELEVENLABS_API_KEY"):
@@ -82,6 +84,10 @@ def set_security_headers(response):
     if request.is_secure:
         response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
     return response
+
+@app.errorhandler(CSRFError)
+def csrf_error(_error):
+    return jsonify({"error": "The form token is missing or expired. Refresh the page and retry."}), 400
 
 @app.errorhandler(413)
 def request_too_large(_error):
