@@ -11,14 +11,18 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
-from generate_process import create_reel
 
 # Load environment variables before service configuration is read.
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
-UPLOAD_FOLDER = str(BASE_DIR / "user_uploads")
-REELS_FOLDER = BASE_DIR / "static" / "reels"
+VERCEL_RUNTIME = os.getenv("VERCEL", "").lower() in {"1", "true"}
+RUNTIME_DATA_DIR = Path("/tmp/vidsnapai") if VERCEL_RUNTIME else BASE_DIR
+UPLOAD_FOLDER = str(RUNTIME_DATA_DIR / "user_uploads")
+REELS_FOLDER = (RUNTIME_DATA_DIR / "reels") if VERCEL_RUNTIME else (BASE_DIR / "static" / "reels")
+RUNTIME_DATA_DIR.mkdir(parents=True, exist_ok=True)
+Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
+REELS_FOLDER.mkdir(parents=True, exist_ok=True)
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 ALLOWED_MUSIC_EXTENSIONS = {"mp3", "wav", "m4a", "aac", "ogg"}
 MAX_TEXT_LENGTH = 500
@@ -50,7 +54,14 @@ app.config["TRUSTED_HOSTS"] = [h.strip() for h in os.getenv("TRUSTED_HOSTS", "")
 
 # Database Configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
+database_url = os.getenv("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+if database_url:
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+else:
+    sqlite_path = (RUNTIME_DATA_DIR / "database.db") if VERCEL_RUNTIME else (Path(basedir) / "database.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + str(sqlite_path)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
@@ -142,6 +153,8 @@ def home():
 def create():
     myid = uuid.uuid4()
     if request.method == "POST":
+        if VERCEL_RUNTIME:
+            return render_template("create.html", myid=myid, success=False, error_message="Video generation is disabled on Vercel serverless. Deploy the media worker separately and connect durable storage and a job queue."), 503
         rec_id = (request.form.get("uuid") or "").strip()
         desc = (request.form.get("text") or "").strip()
 
@@ -257,6 +270,7 @@ def create():
             # Import here to avoid circular imports
             from text_to_audio import text_to_speech_file
             text_to_speech_file(desc, rec_id, voice_id=voice_id, speed=voice_speed)
+            from generate_process import create_reel
             create_reel(rec_id, settings=settings)
             
             # Save metadata to database
@@ -311,6 +325,8 @@ def features():
 
 @app.route("/api/preview-audio", methods=["POST"])
 def preview_audio():
+    if VERCEL_RUNTIME:
+        return jsonify({"error": "Audio preview requires the separate media worker and is disabled on Vercel serverless."}), 503
     try:
         data = request.get_json(silent=True) or {}
         if not isinstance(data, dict):
