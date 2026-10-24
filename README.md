@@ -83,6 +83,11 @@ VidSnapAI is a Flask-based project that combines text-to-speech, subtitle genera
 
 ---
 
+
+## ☁️ Vercel deployment
+
+The Flask web interface has a Vercel Python Function entry point. Follow [`VERCEL_DEPLOYMENT.md`](VERCEL_DEPLOYMENT.md) for environment variables and setup. **Video generation and audio preview are intentionally disabled on Vercel serverless** because FFmpeg/Whisper workloads, uploads, and generated files need a persistent worker and durable storage. Use a separate worker service for full generation.
+
 ## 🔐 Security Notes
 
 - Never commit `.env` files or API credentials. Use `.env.example` as a blank template and set `ELEVENLABS_API_KEY` locally or in the deployment secret store.
