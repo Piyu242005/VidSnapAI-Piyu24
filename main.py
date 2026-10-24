@@ -15,10 +15,18 @@ from generate_process import create_reel
 
 UPLOAD_FOLDER = 'user_uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_MUSIC_EXTENSIONS = {'mp3', 'wav', 'm4a', 'aac', 'ogg'}
+MAX_TEXT_LENGTH = 10000
+
+
+def has_allowed_extension(filename, allowed_extensions):
+    return bool(filename and '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions)
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max request size
+app.config['MAX_FORM_MEMORY_SIZE'] = 2 * 1024 * 1024
 
 # Database Configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -77,8 +85,16 @@ def create():
     myid = uuid.uuid1()
     if request.method == "POST":
         print(request.files.keys())
-        rec_id = request.form.get("uuid")
-        desc = request.form.get("text")
+        rec_id = (request.form.get("uuid") or "").strip()
+        desc = (request.form.get("text") or "").strip()
+
+        # Reject malformed identifiers and empty/oversized prompts before touching the filesystem.
+        try:
+            uuid.UUID(rec_id)
+        except (ValueError, AttributeError, TypeError):
+            return "Invalid generation ID.", 400
+        if not desc or len(desc) > MAX_TEXT_LENGTH:
+            return f"Text must contain 1 to {MAX_TEXT_LENGTH} characters.", 400
         voice_id = request.form.get("voice_id", "pNInz6obpgDQGcFmaJgB")
         voice_speed = float(request.form.get("voice_speed", 1.0))
         music_file = request.form.get("music_file", "")
@@ -95,8 +111,8 @@ def create():
         input_files = []
         durations = {}
         
-        if(not(os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], rec_id)))):
-            os.mkdir(os.path.join(app.config['UPLOAD_FOLDER'], rec_id))
+        upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], rec_id)
+        os.makedirs(upload_dir, exist_ok=True)
         
         # Capture the description and save it to a file
         with open(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, "desc.txt"), "w") as f:
@@ -125,7 +141,11 @@ def create():
         for key, value in request.files.items():
             if key.startswith('file') and value.filename:
                 file = request.files[key]
+                if not has_allowed_extension(file.filename, ALLOWED_EXTENSIONS):
+                    return "Unsupported image type. Use PNG or JPEG files.", 400
                 filename = secure_filename(file.filename)
+                if not filename:
+                    return "Invalid upload filename.", 400
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, filename))
                 input_files.append(filename)
                 
@@ -137,7 +157,11 @@ def create():
         # Handle custom music upload
         custom_music = request.files.get('custom_music')
         if custom_music and custom_music.filename:
+            if not has_allowed_extension(custom_music.filename, ALLOWED_MUSIC_EXTENSIONS):
+                return "Unsupported music type. Use MP3, WAV, M4A, AAC, or OGG.", 400
             music_filename = secure_filename(custom_music.filename)
+            if not music_filename:
+                return "Invalid music filename.", 400
             custom_music.save(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, music_filename))
             settings['music_file'] = music_filename
             settings['custom_music'] = True
@@ -211,8 +235,10 @@ def features():
 @app.route("/api/preview-audio", methods=["POST"])
 def preview_audio():
     try:
-        data = request.json
-        text = data.get('text', '')
+        data = request.get_json(silent=True) or {}
+        text = (data.get('text') or '').strip()
+        if len(text) > MAX_TEXT_LENGTH:
+            return jsonify({'error': f'Text must be at most {MAX_TEXT_LENGTH} characters.'}), 400
         voice_id = data.get('voice_id', 'pNInz6obpgDQGcFmaJgB')
         
         if not text:
@@ -306,4 +332,6 @@ def track_download(reel_id):
     return jsonify({'success': True})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Debug mode must be explicitly enabled for local development only.
+    debug_enabled = os.getenv("FLASK_DEBUG", "0").lower() in {"1", "true", "yes"}
+    app.run(host="127.0.0.1", port=int(os.getenv("PORT", "5000")), debug=debug_enabled)
