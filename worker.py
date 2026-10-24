@@ -64,21 +64,21 @@ def process_job(job, storage):
             (upload_dir / "settings.json").write_text(json.dumps(settings), encoding="utf-8")
             update_job_progress(VideoJob, job.id, "Generating voiceover", 10)
             from text_to_audio import text_to_speech_file
-            text_to_speech_file(description, job.id, voice_id=settings.get("voice_id", "pNInz6obpgDQGcFmaJgB"), speed=float(settings.get("voice_speed", 1)))
+            text_to_speech_file(description, job.id, voice_id=settings.get("voice_id", "pNInz6obpgDQGcFmaJgB"), speed=float(settings.get("voice_speed", 1)), output_path=str(upload_dir / "audio.mp3"))
             # generate_process currently resolves uploads relative to the repository directory.
             # Prepare a compatible temporary layout, then relocate all output paths explicitly.
             import generate_process
-            original_base = generate_process.__file__
             output_dir = work / "static" / "reels"
             output_dir.mkdir(parents=True, exist_ok=True)
             # A worker should not change process-wide CWD; create_reel is refactored to accept paths.
             output_path = generate_process.create_reel(job.id, settings=settings, upload_root=str(work / "user_uploads"), reels_root=str(output_dir))
             if not output_path or not Path(output_path).is_file():
                 raise RuntimeError("output_missing")
+            # An MP4 should contain the ftyp atom near the start of the file.
             with open(output_path, "rb") as handle:
-                if handle.read(8)[:4] != b"\x00\x00\x00\x00" and not Path(output_path).read_bytes().find(b"ftyp") >= 0:
-                    # MP4 may use extended-size atoms, but a playable file must contain ftyp.
-                    raise RuntimeError("output_not_mp4")
+                header = handle.read(64)
+            if b"ftyp" not in header:
+                raise RuntimeError("output_not_mp4")
             update_job_progress(VideoJob, job.id, "Uploading video", 95)
             output_key = f"outputs/{job.user_id}/{job.id}.mp4"
             storage.put_file(output_key, str(output_path))
