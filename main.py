@@ -40,6 +40,8 @@ app.config["MAX_FORM_MEMORY_SIZE"] = 2 * 1024 * 1024
 app.config["MAX_FORM_PARTS"] = 200
 app.config["JSON_SORT_KEYS"] = False
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY") or os.urandom(32)
+if not os.getenv("FLASK_SECRET_KEY"):
+    logger.warning("FLASK_SECRET_KEY is not set; sessions will not persist across restarts.")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.getenv("COOKIE_SECURE", "0").lower() in {"1", "true", "yes"}
@@ -55,6 +57,21 @@ db = SQLAlchemy(app)
 # Validate critical environment variables
 if not os.getenv("ELEVENLABS_API_KEY"):
     logger.warning("ELEVENLABS_API_KEY is not configured; voice generation will be unavailable.")
+
+@app.before_request
+def reject_mutating_requests_without_same_origin():
+    # Origin checking is a defense-in-depth CSRF guard for browser form/API mutations.
+    # Deployments using a reverse proxy must configure the expected public host.
+    if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
+        return None
+    origin = request.headers.get("Origin")
+    if not origin:
+        return None  # Non-browser clients may omit Origin; authentication is still required for public deployment.
+    from urllib.parse import urlparse
+    parsed = urlparse(origin)
+    if parsed.scheme not in {"http", "https"} or parsed.netloc != request.host:
+        return jsonify({"error": "Cross-origin request rejected."}), 403
+    return None
 
 @app.after_request
 def set_security_headers(response):
