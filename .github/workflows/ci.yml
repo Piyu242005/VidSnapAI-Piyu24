@@ -2,7 +2,7 @@ name: Python quality checks
 
 on:
   push:
-    branches: ["master", "fix/security-reliability", "upgrade/production-quality"]
+    branches: ["master", "fix/security-reliability", "upgrade/production-quality", "phase1/production-core"]
   pull_request:
     branches: ["master"]
 
@@ -23,8 +23,8 @@ jobs:
       - name: Install project and test dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Lint changed Python modules
-        run: ruff check main.py security_utils.py test_security_utils.py --output-format=github
+        run: ruff check main.py security_utils.py test_security_utils.py production worker.py tests --output-format=github
       - name: Compile Python files
-        run: python -m compileall -q main.py generate_process.py text_to_audio.py config.py pipeline security_utils.py
+        run: python -m compileall -q main.py generate_process.py text_to_audio.py config.py pipeline security_utils.py production worker.py tests
       - name: Run unit tests
         run: python -m unittest discover -v
