@@ -2,7 +2,7 @@
 
 # 🎬 VidSnapAI
 
-**Production-Ready AI-Powered Video Generation Engine**
+**AI-Powered Short-Form Video Generation Project**
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-black?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -27,7 +27,7 @@ VidSnapAI is a premium, AI-driven platform for automating the creation of high-i
 
 ### 🧠 AI Features
 *   🎙️ **Neural Voice Synthesis:** Studio-quality voiceovers powered by the ElevenLabs API.
-*   🖋️ **Whisper Subtitles:** Automated word-sync transcription with OpenAI Whisper.
+*   🖋️ **Whisper Subtitles:** Automatic speech transcription and timed captions with Whisper.
 
 ### 🎬 Video Processing
 *   🥁 **Beat-Synced Transitions:** Intelligent audio analysis matching cuts to background music.
@@ -54,7 +54,7 @@ VidSnapAI is a premium, AI-driven platform for automating the creation of high-i
 1. **Upload & Prompt:** Provide a topic/text prompt, and drop your base images into the intuitive creator dashboard.
 2. **AI Generation & Processing:** The engine automatically synthesizes neural speech, calculates Whisper subtitle timings, and maps beat-synced transitions.
 3. **Video Compositing:** Watch as FFmpeg seamlessly multiplexes voice, music, generated subtitles, and visual effects in the background.
-4. **Export & Share:** Instantly preview and download your high-converting, professional MP4 directly from the integrated Gallery.
+4. **Export & Share:** Preview and download the generated MP4 from the integrated Gallery.
 
 ---
 
@@ -82,6 +82,23 @@ VidSnapAI is a premium, AI-driven platform for automating the creation of high-i
 | **ElevenLabs** | Neural Text-to-Speech |
 
 ---
+
+## 🔐 Security Notes
+
+- Never commit `.env` files or API credentials. Set `ELEVENLABS_API_KEY` in your local environment.
+- If a key was ever committed, revoke/rotate it with the provider immediately. Removing the file in a later commit does not remove it from Git history; rewrite history if needed and coordinate the force-push carefully.
+- The development server is bound to `127.0.0.1` by default. Do not expose Flask's built-in server to the public internet.
+- Upload validation is a basic safeguard, not a substitute for production-grade media decoding, malware scanning, authentication, CSRF protection, and resource limits.
+
+## 🧪 Validation
+
+Run a syntax check before launching:
+
+```bash
+python -m compileall -q main.py generate_process.py text_to_audio.py config.py pipeline
+```
+
+A full end-to-end test requires FFmpeg, the Whisper dependencies/model, and a valid ElevenLabs API key. Those external integrations are not verified by a syntax check.
 
 ## 📁 Project Structure
 
