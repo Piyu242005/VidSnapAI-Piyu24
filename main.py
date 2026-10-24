@@ -376,6 +376,8 @@ def delete_reel(reel_id):
 
 @app.route("/api/reel-stats/<reel_id>")
 def reel_stats(reel_id):
+    if not is_valid_upload_id(reel_id):
+        return jsonify({"error": "Invalid reel ID"}), 400
     reel = Reel.query.get(reel_id)
     if reel:
         return jsonify({
@@ -387,11 +389,15 @@ def reel_stats(reel_id):
 
 @app.route("/api/track-view/<reel_id>", methods=["POST"])
 def track_view(reel_id):
+    if not is_valid_upload_id(reel_id):
+        return jsonify({"error": "Invalid reel ID"}), 400
     update_reel_stats(reel_id, 'view')
     return jsonify({'success': True})
 
 @app.route("/api/track-download/<reel_id>", methods=["POST"])
 def track_download(reel_id):
+    if not is_valid_upload_id(reel_id):
+        return jsonify({"error": "Invalid reel ID"}), 400
     update_reel_stats(reel_id, 'download')
     return jsonify({'success': True})
 
