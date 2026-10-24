@@ -86,7 +86,7 @@ VidSnapAI is a Flask-based project that combines text-to-speech, subtitle genera
 
 ## ☁️ Vercel deployment
 
-The Flask web interface has a Vercel Python Function entry point. Follow [`VERCEL_DEPLOYMENT.md`](VERCEL_DEPLOYMENT.md) for environment variables and setup. **Video generation and audio preview are intentionally disabled on Vercel serverless** because FFmpeg/Whisper workloads, uploads, and generated files need a persistent worker and durable storage. Use a separate worker service for full generation.
+The deployed web preview is available at [vid-snap-ai-piyu24.vercel.app](https://vid-snap-ai-piyu24.vercel.app/). The homepage is live; this deployment is a web preview, not a complete video-generation service. Follow [`VERCEL_DEPLOYMENT.md`](VERCEL_DEPLOYMENT.md) for environment variables and setup. **Video generation and audio preview are intentionally disabled on Vercel serverless** because FFmpeg/Whisper workloads, uploads, and generated files need a persistent worker and durable storage. Use a separate worker service for full generation.
 
 ## 🔐 Security Notes
 
@@ -98,7 +98,7 @@ The Flask web interface has a Vercel Python Function entry point. Follow [`VERCE
 
 ## 🚧 Production-readiness status
 
-This repository is an active project, not a certified or audited production service. Authentication and authorization, CSRF protections, durable background jobs, concurrency/load testing, secure media sandboxing, monitoring, and deployment-specific hardening still require implementation and verification. Do not use it to process sensitive uploads or expose it publicly without completing those controls.
+This repository is an active project, not a certified or audited production service. Authentication and authorization, rate limiting, durable background jobs, concurrency/load testing, secure media sandboxing, monitoring, and deployment-specific hardening still require implementation and verification. Flask-WTF CSRF protection and same-origin checks are present, but they do not replace authentication or the other controls listed above. Do not use it to process sensitive uploads or expose it publicly without completing those controls.
 
 ## 🧪 Validation
 
