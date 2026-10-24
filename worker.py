@@ -11,17 +11,14 @@ import tempfile
 import time
 from pathlib import Path
 
-from main import app, db
+from main import app, db, VideoJob
 from production.jobs import (
-    claim_next_job, create_job_model, fail_job, finish_job, init_jobs, update_job_progress,
+    claim_next_job, fail_job, finish_job, update_job_progress,
 )
 from production.storage import storage_from_env
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("vidsnapai.worker")
-init_jobs(db)
-VideoJob = create_job_model(db)
-
 
 def process_job(job, storage):
     """Download a job's manifest, render with the existing pipeline, upload output."""
