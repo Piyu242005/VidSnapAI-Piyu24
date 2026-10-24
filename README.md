@@ -164,3 +164,15 @@ python generate_process.py
 Data Scientist | AI Developer
 
 [GitHub Profile](https://github.com/Piyu242005)
+
+---
+
+<footer>
+  <p align="center">Made with 🎬, Python, Flask, and FFmpeg</p>
+  <p align="center">
+    <a href="https://github.com/Piyu242005/VidSnapAI-Piyu24">Repository</a> ·
+    <a href="https://vid-snap-ai-piyu24.vercel.app/">Live Web Preview</a> ·
+    <a href="https://github.com/Piyu242005">GitHub Profile</a>
+  </p>
+  <p align="center">© VidSnapAI · Open-source project under the MIT License</p>
+</footer>
