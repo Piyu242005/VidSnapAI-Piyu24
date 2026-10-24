@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, send_file
-import math
 import uuid
 from werkzeug.utils import secure_filename
 import os
@@ -7,7 +6,6 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from datetime import datetime
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
@@ -26,7 +24,6 @@ ALLOWED_MUSIC_EXTENSIONS = {"mp3", "wav", "m4a", "aac", "ogg"}
 MAX_TEXT_LENGTH = 500
 MAX_UPLOAD_BYTES = int(os.getenv("MAX_CONTENT_LENGTH", str(100 * 1024 * 1024)))
 DEFAULT_VOICE_ID = "pNInz6obpgDQGcFmaJgB"
-ALLOWED_VOICE_SPEED = (0.5, 2.0)
 ALLOWED_ASPECT_RATIOS = {"9:16", "16:9", "1:1"}
 ALLOWED_QUALITIES = {"720p", "1080p"}
 ALLOWED_TRANSITIONS = {"none", "fade", "slide", "zoom"}
@@ -311,13 +308,14 @@ def preview_audio():
         
         try:
             from text_to_audio import text_to_speech_file
-            text_to_speech_file(text, f'temp_{temp_id}', voice_id=voice_id, speed=1.0)
-            audio_path = os.path.join(temp_folder, 'audio.mp3')
-            
+            text_to_speech_file(text, f"temp_{temp_id}", voice_id=voice_id, speed=1.0)
+            audio_path = os.path.join(temp_folder, "audio.mp3")
             if os.path.exists(audio_path):
-                return send_file(audio_path, mimetype='audio/mpeg')
-            else:
-                return jsonify({'error': 'Audio file was not generated. Check ElevenLabs API Key.'}), 500
+                response = send_file(audio_path, mimetype="audio/mpeg")
+                response.call_on_close(lambda: shutil.rmtree(temp_folder, ignore_errors=True))
+                return response
+            shutil.rmtree(temp_folder, ignore_errors=True)
+            return jsonify({"error": "Audio file was not generated. Check server configuration."}), 500
                 
         except Exception:
             logger.exception("Audio preview failed")
