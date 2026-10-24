@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from security_utils import has_allowed_extension
 
 # Load environment variables
 load_dotenv()
@@ -18,9 +19,6 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_MUSIC_EXTENSIONS = {'mp3', 'wav', 'm4a', 'aac', 'ogg'}
 MAX_TEXT_LENGTH = 10000
 
-
-def has_allowed_extension(filename, allowed_extensions):
-    return bool(filename and '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions)
 
 
 app = Flask(__name__)
