@@ -57,14 +57,27 @@
         </span>
     </div>
 
+    {% if processing_jobs %}
+    <div class="processing-strip" data-aos="fade-up">
+        <div class="processing-strip-head"><strong><i class="fas fa-spinner fa-spin me-2"></i>In progress</strong><a href="/dashboard">View jobs</a></div>
+        {% for job in processing_jobs %}
+        <div class="processing-job"><span>{{ job.stage }}</span><div class="processing-progress"><i style="width:{{ job.progress }}%"></i></div><small>{{ job.progress }}%</small></div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <!-- Gallery grid -->
     <div class="gallery-grid" id="galleryGrid">
         {% for reel in reels %}
         {% set reel_id = reel.rsplit('.', 1)[0] %}
         {% set reel_meta = metadata.get(reel_id, {}) %}
+        {% set prompt_text = reel_meta.get('text', '')|trim %}
+        {% set reel_title = prompt_text[:48] ~ ('…' if prompt_text|length > 48 else '') if prompt_text else ('Reel · ' ~ (reel_meta.get('created_at', '')[:10] if reel_meta.get('created_at') else reel_id[:8])) %}
         <div class="gallery-item"
              data-reel-id="{{ reel_id }}"
              data-reel-name="{{ reel }}"
+             data-title="{{ reel_title }}"
+             data-date="{{ reel_meta.get('created_at', '')[:10] if reel_meta.get('created_at') else '' }}"
              data-aos="fade-up"
              data-aos-delay="{{ loop.index0 * 60 }}">
             <div class="reel-card">
@@ -97,43 +110,33 @@
                 <div class="reel-info">
                     <h3 class="reel-title">
                         <i class="fas fa-film"></i>
-                        {{ reel.rsplit('.', 1)[0][:28] }}{{ '…' if reel.rsplit('.', 1)[0]|length > 28 else '' }}
+                        {{ reel_title }}
                     </h3>
-                    <p class="reel-date">
-                        <i class="fas fa-calendar-alt"></i>
+                    <p class="reel-meta">
                         {% if reel_meta.get('created_at') %}
                             {{ reel_meta.get('created_at')[:10] }}
                         {% else %}
                             Unknown date
                         {% endif %}
+                        · <i class="fas fa-eye"></i> {{ reel_meta.get('views', 0) }}
+                        · <i class="fas fa-download"></i> {{ reel_meta.get('downloads', 0) }}
                     </p>
-                    {% if reel_meta.get('text') %}
-                    <p class="reel-text-preview" style="font-size: 0.85em; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 10px;" title="{{ reel_meta.get('text') }}">
-                        <i class="fas fa-quote-left"></i> {{ reel_meta.get('text') }}
-                    </p>
-                    {% endif %}
                     <div class="reel-actions">
+                        <button class="btn-fullscreen" onclick="openFullscreen('{{ url_for('static', filename='reels/' + reel) }}')" title="Play">
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                        <a href="{{ url_for('static', filename='reels/' + reel) }}" download="{{ reel }}" class="btn-download" onclick="trackDownload('{{ reel_id }}')" title="Download">
+                            <i class="fas fa-download"></i> Download
+                        </a>
                         <button class="btn-share"
                                 onclick="shareReel('{{ reel_id }}', '{{ reel }}')"
                                 title="Share">
                             <i class="fas fa-share-alt"></i> Share
                         </button>
-                        <a href="{{ url_for('static', filename='reels/' + reel) }}"
-                           download="{{ reel }}"
-                           class="btn-download"
-                           onclick="trackDownload('{{ reel_id }}')"
-                           title="Download">
-                            <i class="fas fa-download"></i> Download
-                        </a>
-                        <button class="btn-fullscreen"
-                                onclick="openFullscreen('{{ url_for('static', filename='reels/' + reel) }}')"
-                                title="Fullscreen">
-                            <i class="fas fa-expand"></i>
-                        </button>
                         <button class="btn-delete"
                                 onclick="deleteReel('{{ reel_id }}', '{{ reel }}')"
-                                title="Delete">
-                            <i class="fas fa-trash"></i>
+                                title="More: Delete">
+                            <i class="fas fa-ellipsis"></i>
                         </button>
                     </div>
                 </div>
@@ -177,15 +180,9 @@
                     </button>
                 </div>
                 <div class="social-share">
-                    <a href="#" class="social-btn instagram" id="shareInstagram" target="_blank" rel="noopener">
-                        <i class="fab fa-instagram"></i> Share on Instagram
-                    </a>
-                    <a href="#" class="social-btn tiktok" id="shareTikTok" target="_blank" rel="noopener">
-                        <i class="fab fa-tiktok"></i> Share on TikTok
-                    </a>
-                    <a href="#" class="social-btn youtube" id="shareYouTube" target="_blank" rel="noopener">
-                        <i class="fab fa-youtube"></i> Share on YouTube
-                    </a>
+                    <button type="button" class="social-btn" id="nativeShareBtn" onclick="nativeShareReel()">
+                        <i class="fas fa-share-nodes"></i> Share
+                    </button>
                 </div>
                 <div class="qr-code-container" id="qrCodeContainer"></div>
             </div>
@@ -238,12 +235,6 @@ function shareReel(reelId, reelName) {
             const urlInput = document.getElementById('shareUrlInput');
             const shareUrl = data.share_url || `${window.location.origin}/static/reels/${reelName}`;
             urlInput.value = shareUrl;
-            document.getElementById('shareInstagram').href =
-                `https://www.instagram.com/create/story/?media=${encodeURIComponent(shareUrl)}`;
-            document.getElementById('shareTikTok').href =
-                `https://www.tiktok.com/upload?video=${encodeURIComponent(shareUrl)}`;
-            document.getElementById('shareYouTube').href =
-                `https://www.youtube.com/upload?video=${encodeURIComponent(shareUrl)}`;
             generateQRCode(shareUrl);
             modal.style.display = 'flex';
         })
@@ -259,6 +250,15 @@ function copyShareUrl() {
         document.execCommand('copy');
     });
     if (window.notifications) window.notifications.success('Link copied to clipboard!');
+}
+
+function nativeShareReel() {
+    const url = document.getElementById('shareUrlInput').value;
+    if (navigator.share) {
+        navigator.share({ title: 'VidSnapAI reel', url }).catch(() => {});
+    } else {
+        copyShareUrl();
+    }
 }
 
 function generateQRCode(url) {

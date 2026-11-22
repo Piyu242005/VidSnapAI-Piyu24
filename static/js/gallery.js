@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Filter
         let filtered = items.filter(item => {
-            const reelName = item.dataset.reelName.toLowerCase();
+            const reelName = (item.dataset.title || item.dataset.reelName).toLowerCase();
             const matchesSearch = !searchTerm || reelName.includes(searchTerm);
             
             if (!matchesSearch) return false;
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (filter === 'all') return true;
             if (filter === 'recent') {
                 // Show items from last 7 days
-                const dateStr = item.querySelector('.reel-date')?.textContent.trim();
+                const dateStr = item.dataset.date || '';
                 if (!dateStr || dateStr === 'Unknown') return false;
                 const itemDate = new Date(dateStr);
                 const weekAgo = new Date();
@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
         filtered.sort((a, b) => {
             const aName = a.dataset.reelName.toLowerCase();
             const bName = b.dataset.reelName.toLowerCase();
-            const aDate = a.querySelector('.reel-date')?.textContent.trim() || '';
-            const bDate = b.querySelector('.reel-date')?.textContent.trim() || '';
+            const aDate = a.dataset.date || '';
+            const bDate = b.dataset.date || '';
             
             if (sort === 'name-asc') {
                 return aName.localeCompare(bName);
@@ -118,4 +118,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Login — VidSnapAI{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+<style>
+.auth-wrap{min-height:70vh;display:grid;place-items:center;padding:3rem 1rem}.auth-card{width:min(440px,100%);background:var(--card-bg);border:1px solid var(--border-color);border-radius:20px;padding:2rem;box-shadow:var(--shadow)}.auth-card h1{font-size:1.75rem;font-weight:800}.auth-card .form-control{background:var(--bg-primary);color:var(--text-primary);border-color:var(--border-color)}.auth-card .form-control:focus{border-color:var(--accent-color);box-shadow:0 0 0 .2rem rgba(255,0,0,.12)}.auth-submit{width:100%;background:var(--accent-color);color:#fff;border:0;padding:.8rem;border-radius:10px;font-weight:700}.auth-alert{color:#ffb4b4;background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.25);border-radius:10px;padding:.75rem}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap"><div class="auth-card">
+  <h1 class="mb-2">Welcome back</h1><p class="text-secondary mb-4">Sign in to manage your reels and jobs.</p>
+  {% if error %}<div class="auth-alert mb-3">{{ error }}</div>{% endif %}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control" id="email" name="email" type="email" autocomplete="email" required></div>
+    <div class="mb-4"><label class="form-label" for="password">Password</label><input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required></div>
+    <button class="auth-submit" type="submit">Log in</button>
+  </form>
+  <p class="text-center mt-4 mb-0 text-secondary">New to VidSnapAI? <a href="/register">Create an account</a></p>
+</div></div>
+{% endblock %}

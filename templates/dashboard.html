@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}My Jobs — VidSnapAI{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+<style>
+.jobs-wrap{padding:3.5rem 0 5rem}.jobs-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}.job-card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:14px;padding:1rem;margin-bottom:.75rem}.progress{height:8px;background:var(--bg-primary)}.progress-bar{background:var(--accent-color)}.jobs-table{width:100%;border-collapse:collapse}.jobs-table th,.jobs-table td{padding:.85rem;border-bottom:1px solid var(--border-color);text-align:left}.status{font-size:.78rem;padding:.3rem .6rem;border-radius:999px;border:1px solid var(--border-color)}@media(max-width:700px){.jobs-table{display:block;overflow-x:auto}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container jobs-wrap">
+  <div class="jobs-head"><div><h1 class="gallery-title mb-1">My Jobs</h1><p class="text-secondary mb-0">Track video generation progress.</p></div><a href="/create" class="btn-create">Create Reel</a></div>
+  {% if processing_jobs %}
+  <h2 class="h5 mb-3">In progress</h2>
+  {% for job in processing_jobs %}
+  <div class="job-card"><div class="d-flex justify-content-between"><strong>{{ job.stage }}</strong><span>{{ job.progress }}%</span></div><div class="progress mt-2"><div class="progress-bar" style="width:{{ job.progress }}%"></div></div></div>
+  {% endfor %}
+  {% endif %}
+  <div class="reel-card p-3 mt-4">
+  {% if jobs %}
+  <table class="jobs-table"><thead><tr><th>Job</th><th>Status</th><th>Stage</th><th>Created</th><th>Download</th></tr></thead><tbody>
+  {% for job in jobs %}<tr><td><code>{{ job.id[:8] }}</code></td><td><span class="status">{{ job.status }}</span></td><td>{{ job.stage }} · {{ job.progress }}%</td><td>{{ job.created_at.strftime('%Y-%m-%d %H:%M') if job.created_at else '—' }}</td><td>{% if job.status == 'succeeded' %}<a href="/api/v1/jobs/{{ job.id }}/download">Download</a>{% else %}—{% endif %}</td></tr>{% endfor %}
+  </tbody></table>
+  {% else %}<div class="empty-gallery py-5"><i class="fas fa-list-check"></i><h2>No jobs yet</h2><p>Create your first reel to see its progress here.</p><a href="/create" class="btn-create">Create Reel</a></div>{% endif %}
+  </div>
+</div>
+{% endblock %}
