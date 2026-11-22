@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -17,9 +18,12 @@ class LocalStorage:
         self.root.mkdir(parents=True, exist_ok=True)
 
     def _path(self, key: str) -> Path:
-        if not isinstance(key, str) or not key or key.startswith("/") or "\\" in key:
+        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", key):
             raise ValueError("Invalid storage key")
-        path = (self.root / key).resolve()
+        parts = [part for part in key.split("/") if part not in {"", ".", ".."}]
+        if not parts or any(part in {"", ".", ".."} for part in parts):
+            raise ValueError("Invalid storage key")
+        path = self.root.joinpath(*parts).resolve()
         if self.root not in path.parents:
             raise ValueError("Invalid storage key")
         return path

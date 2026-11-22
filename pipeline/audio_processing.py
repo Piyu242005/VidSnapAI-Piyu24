@@ -1,5 +1,9 @@
 import os
 import subprocess
+import logging
+import time
+
+logger = logging.getLogger("vidsnapai.pipeline.audio")
 
 def process_audio(voice_file, music_file, output_audio, max_duration=None):
     """
@@ -10,13 +14,14 @@ def process_audio(voice_file, music_file, output_audio, max_duration=None):
         raise FileNotFoundError(f"Voiceover track missing: {voice_file}")
 
     filters = []
-    inputs = [f'-i "{voice_file}"']
+    inputs = ["-i", os.path.abspath(voice_file)]
 
     # Standardize voice channel, normalize loudness, add subtle compression
     filters.append("[0:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo,acompressor=threshold=-15dB:ratio=4:attack=5:release=50[voice]")
     
     if music_file and os.path.exists(music_file):
-        inputs.append(f'-i "{music_file}"')
+        inputs.append("-i")
+        inputs.append(os.path.abspath(music_file))
         
         # Loop music, add ducking taking [voice] as sidechain
         # We also apply a subtle fade-in to the music to prevent harsh starts
@@ -31,9 +36,18 @@ def process_audio(voice_file, music_file, output_audio, max_duration=None):
     filter_complex = ";".join(filters)
     
     # Clip duration if audio shouldn't exceed max length
-    duration_flag = f"-t {max_duration}" if max_duration else ""
-
-    command = f'ffmpeg -y {" ".join(inputs)} -filter_complex "{filter_complex}" {map_arg} {duration_flag} -c:a aac -b:a 256k "{output_audio}"'
-    subprocess.run(command, shell=True, check=True, capture_output=True)
+    command = ["ffmpeg", "-y", *inputs, "-filter_complex", filter_complex]
+    command.extend(map_arg.split())
+    if max_duration:
+        command.extend(["-t", str(max_duration)])
+    command.extend(["-c:a", "aac", "-b:a", "256k", os.path.abspath(output_audio)])
+    started = time.monotonic()
+    result = subprocess.run(command, shell=False, capture_output=True, text=True,
+                            timeout=int(os.getenv("FFMPEG_TIMEOUT_SECONDS", "1800")))
+    duration = time.monotonic() - started
+    if result.returncode != 0:
+        logger.error("FFmpeg audio failed returncode=%s duration=%.2fs stderr=%s",
+                     result.returncode, duration, (result.stderr or "").strip()[-4000:])
+        raise RuntimeError("FFmpeg audio pipeline failed")
     
     return output_audio

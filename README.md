@@ -94,7 +94,24 @@ The deployed web preview is available at [vid-snap-ai-piyu24.vercel.app](https:/
 - If a key was ever committed, revoke/rotate it with the provider immediately. Removing the file in a later commit does not remove it from Git history; rewrite history if needed and coordinate the force-push carefully.
 - The development server is bound to `127.0.0.1` by default. Do not expose Flask's built-in server to the public internet.
 - Upload checks include extension and basic file-content validation, plus request and field limits. They are not a substitute for sandboxed media decoding, malware scanning, authentication/authorization, CSRF protection, per-user quotas, and resource limits.
-- Generation still has synchronous work in the web request path. Use a durable queue/worker design before accepting untrusted public traffic.
+- Generation is asynchronous: the web application only validates and queues work, while `worker.py` performs media processing.
+
+## Authentication and async generation
+
+VidSnapAI uses a simple email/password account system. Register at `/register` or call `POST /register` with JSON (`email`, `password`, at least 8 characters). Log in at `/login` with JSON or the login form; the server stores only a session identity. Log out with `POST /logout`.
+
+Generation is worker-only. `POST /create` and all `/api/v1/jobs*` routes require a login. Configure storage and start both processes:
+
+```bash
+# Terminal 1
+python main.py
+# Terminal 2
+python worker.py
+```
+
+Set `FLASK_SECRET_KEY` to a stable secret, and configure `ELEVENLABS_API_KEY`, `STORAGE_BACKEND`, and storage credentials. Local development uses `STORAGE_BACKEND=local` with `LOCAL_STORAGE_DIR=var/media`; use S3-compatible storage for durable deployments.
+
+Job quotas default to 20 jobs per user per UTC day and 5 creations per minute. Configure `DAILY_JOB_LIMIT` and `JOB_CREATION_RATE_LIMIT`. Exceeded limits return HTTP 429 with a clear JSON `error`.
 
 ## 🚧 Production-readiness status
 
@@ -153,7 +170,7 @@ pip install -r requirements.txt
 # Terminal 1:
 python main.py
 # Terminal 2:
-python generate_process.py
+python worker.py
 ```
 
 ---

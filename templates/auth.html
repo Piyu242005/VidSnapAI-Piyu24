@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ "Register" if mode == "register" else "Login" }} - VidSnapAI{% endblock %}
+{% block content %}
+<section class="container" style="max-width: 480px; margin: 3rem auto;">
+  <h1>{{ "Create account" if mode == "register" else "Sign in" }}</h1>
+  <form method="post" action="{{ '/register' if mode == 'register' else '/login' }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3">
+      <label class="form-label" for="email">Email</label>
+      <input class="form-control" id="email" name="email" type="email" autocomplete="email" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-control" id="password" name="password" type="password" minlength="8" maxlength="128" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" required>
+    </div>
+    <button class="btn btn-primary" type="submit">{{ "Register" if mode == "register" else "Login" }}</button>
+  </form>
+  {% if mode == "register" %}
+  <p class="mt-3">Already have an account? <a href="/login">Sign in</a></p>
+  {% else %}
+  <p class="mt-3">Need an account? <a href="/register">Register</a></p>
+  {% endif %}
+</section>
+{% endblock %}

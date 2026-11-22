@@ -1,9 +1,13 @@
 import subprocess
 import os
+import logging
+import time
 from pathlib import Path
 from .audio_processing import process_audio
 from .transitions import build_transition_complex_filter
 from .subtitles import generate_subtitles_filter
+
+logger = logging.getLogger("vidsnapai.pipeline.video")
 
 def create_premium_reel(folder_path, images_data, text_timing_data, settings):
     output_file = os.path.join(folder_path, "final_reel.mp4")
@@ -38,7 +42,9 @@ def create_premium_reel(folder_path, images_data, text_timing_data, settings):
         height = int(height * 720 / max(width, height))
 
     # 2. Prepare Dynamic Visuals & Transitions (CapCut Style)
-    ffmpeg_inputs = [f"-i \"{img['file']}\"" for img in images_data]
+    ffmpeg_inputs = []
+    for img in images_data:
+        ffmpeg_inputs.extend(["-i", os.path.abspath(img["file"])])
     visual_filters = build_transition_complex_filter(images_data, width, height)
     
     # 3. Apply Subtitles
@@ -56,21 +62,29 @@ def create_premium_reel(folder_path, images_data, text_timing_data, settings):
         map_v = "[base_video]"
 
     # 4. Final High-Quality Export Command
-    inputs_cmd = " ".join(ffmpeg_inputs)
-    
-    # High quality settings for reels (-crf 18)
-    command = (
-        f"ffmpeg -y {inputs_cmd} -i \"{temp_audio_file}\" "
-        f'-filter_complex "{visual_filters}" '
-        f"-map {map_v} -map {len(images_data)}:a "
-        f"-c:v libx264 -preset slow -crf 18 -profile:v high -level:v 4.2 "
-        f"-pix_fmt yuv420p -color_range 1 -colorspace 1 -color_primaries 1 -color_trc 1 "
-        f"-c:a aac -b:a 256k -shortest \"{output_file}\""
-    )
-    
-    print("Compiling Reel with CapCut Editing Engine...")
-    result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=int(os.getenv("FFMPEG_TIMEOUT_SECONDS", "1800")))
+    command = [
+        "ffmpeg", "-y", *ffmpeg_inputs, "-i", os.path.abspath(temp_audio_file),
+        "-filter_complex", visual_filters,
+        "-map", map_v, "-map", f"{len(images_data)}:a",
+        "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-profile:v", "high", "-level:v", "4.2",
+        "-pix_fmt", "yuv420p", "-color_range", "1", "-colorspace", "1", "-color_primaries", "1", "-color_trc", "1",
+        "-c:a", "aac", "-b:a", "256k", "-shortest", os.path.abspath(output_file),
+    ]
+
+    logger.info("Compiling Reel with CapCut Editing Engine")
+    started = time.monotonic()
+    try:
+        result = subprocess.run(command, shell=False, capture_output=True, text=True,
+            timeout=int(os.getenv("FFMPEG_TIMEOUT_SECONDS", "1800")))
+    except subprocess.TimeoutExpired:
+        logger.error("FFmpeg timed out after %.2fs", time.monotonic() - started)
+        raise
+    duration = time.monotonic() - started
     if result.returncode != 0:
-        raise Exception(f"FFmpeg pipeline fail: {result.stderr}")
+        stderr = (result.stderr or "").strip()[-4000:]
+        logger.error("FFmpeg failed returncode=%s duration=%.2fs stderr=%s",
+                     result.returncode, duration, stderr)
+        raise RuntimeError("FFmpeg pipeline failed")
+    logger.info("FFmpeg completed returncode=%s duration=%.2fs", result.returncode, duration)
     
     return output_file

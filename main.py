@@ -1,15 +1,17 @@
-from flask import Flask, render_template, request, jsonify, send_file, g, session
+from flask import Flask, render_template, request, jsonify, send_file, g, session, redirect, url_for
 import uuid
 from werkzeug.utils import secure_filename
 import os
 import json
 import logging
 import shutil
+import tempfile
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from werkzeug.security import generate_password_hash, check_password_hash
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
 from production.jobs import create_job_model, enqueue_job, init_jobs
 from production.storage import storage_from_env, StorageConfigurationError
@@ -134,6 +136,21 @@ class Reel(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
+
+class User(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
+    quota_date = db.Column(db.Date, nullable=True)
+    daily_jobs = db.Column(db.Integer, nullable=False, default=0)
+    minute_window = db.Column(db.DateTime(timezone=True), nullable=True)
+    minute_jobs = db.Column(db.Integer, nullable=False, default=0)
+
+with app.app_context():
+    db.create_all()
+
 # Schema changes are applied by a controlled migration command, not app import.
 
 # Helper for old metadata structure mapping
@@ -145,7 +162,90 @@ def update_reel_stats(reel_id, stat_type='view'):
         elif stat_type == 'download':
             reel.downloads += 1
         db.session.commit()
- 
+
+
+def _auth_value(field):
+    payload = request.get_json(silent=True) if request.is_json else None
+    value = payload.get(field) if isinstance(payload, dict) else request.form.get(field)
+    return value.strip() if isinstance(value, str) else ""
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("auth.html", mode="register")
+    email = _auth_value("email").lower()
+    password = _auth_value("password")
+    if not email or "@" not in email or len(email) > 255:
+        return jsonify({"error": "invalid_email"}), 400
+    if len(password) < 8 or len(password) > 128:
+        return jsonify({"error": "invalid_password"}), 400
+    if User.query.filter_by(email=email).first():
+        return jsonify({"error": "email_exists"}), 409
+    user = User(email=email, password_hash=generate_password_hash(password))
+    db.session.add(user)
+    db.session.commit()
+    session.clear()
+    session["user_id"] = user.id
+    if not request.is_json:
+        return redirect(url_for("create"))
+    return jsonify({"user_id": user.id, "email": user.email}), 201
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("auth.html", mode="login")
+    email = _auth_value("email").lower()
+    password = _auth_value("password")
+    user = User.query.filter_by(email=email).first() if email else None
+    if not user or not user.is_active or not check_password_hash(user.password_hash, password):
+        return jsonify({"error": "invalid_credentials"}), 401
+    session.clear()
+    session["user_id"] = user.id
+    if not request.is_json:
+        return redirect(url_for("create"))
+    return jsonify({"user_id": user.id, "email": user.email}), 200
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    if not request.is_json:
+        return redirect(url_for("home"))
+    return jsonify({"success": True}), 200
+
+
+def _check_job_quota(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if not user or not user.is_active:
+        return "authentication_required", 401
+    today = datetime.now(timezone.utc).date()
+    now = datetime.now(timezone.utc)
+    if user.quota_date != today:
+        user.quota_date = today
+        user.daily_jobs = 0
+    minute_window = user.minute_window
+    if minute_window is not None and minute_window.tzinfo is None:
+        minute_window = minute_window.replace(tzinfo=timezone.utc)
+    if minute_window is None or (now - minute_window).total_seconds() >= 60:
+        user.minute_window = now
+        user.minute_jobs = 0
+    try:
+        daily_limit = max(0, int(os.getenv("DAILY_JOB_LIMIT", "20")))
+        minute_limit = max(0, int(os.getenv("JOB_CREATION_RATE_LIMIT", "5")))
+    except ValueError:
+        daily_limit, minute_limit = 20, 5
+    if user.daily_jobs >= daily_limit:
+        db.session.rollback()
+        return "quota_exceeded", 429
+    if user.minute_jobs >= minute_limit:
+        db.session.rollback()
+        return "rate_limit_exceeded", 429
+    user.daily_jobs += 1
+    user.minute_jobs += 1
+    db.session.commit()
+    return None, 200
 
 @app.route("/")
 def home():
@@ -156,11 +256,23 @@ def create():
     myid = uuid.uuid4()
     if request.method == "GET":
         return render_template("create.html", myid=myid)
+    if not _request_user_id():
+        if request.accept_mimetypes.best == "application/json":
+            return jsonify({"error": "authentication_required"}), 401
+        return render_template("create.html", myid=myid, success=False,
+            error_message="Sign in before creating a reel."), 401
     if VERCEL_RUNTIME:
         # Keep the current UI closed until authenticated async processing is configured.
         return render_template("create.html", myid=myid, success=False,
             error_message="Online generation is not enabled until authentication, PostgreSQL, object storage and the persistent worker are configured."), 503
-    return _create_local_reel(myid)
+    try:
+        return _create_local_reel(myid)
+    except Exception:
+        logger.exception("Unhandled local reel submission error")
+        if request.accept_mimetypes.best == "application/json":
+            return jsonify({"error": "job_submission_failed"}), 500
+        return render_template("create.html", myid=myid, success=False,
+            error_message="Job submission failed. Please try again."), 500
 
 
 def _request_user_id():
@@ -175,6 +287,9 @@ def create_job_api():
     user_id = _request_user_id()
     if not user_id:
         return jsonify({"error": "authentication_required"}), 401
+    quota_error, quota_status = _check_job_quota(user_id)
+    if quota_error:
+        return jsonify({"error": quota_error}), quota_status
     if not request.is_json:
         return jsonify({"error": "expected_json"}), 415
     payload = request.get_json(silent=True)
@@ -238,147 +353,88 @@ def download_job_api(job_id):
 
 
 def _create_local_reel(myid):
-    # Legacy local synchronous pipeline retained for backwards-compatible development.
+    """Async-only local create flow; generation is performed exclusively by worker.py."""
+    user_id = _request_user_id()
+    if not user_id:
+        return jsonify({"error": "authentication_required"}), 401
+
     rec_id = (request.form.get("uuid") or "").strip()
     desc = (request.form.get("text") or "").strip()
-
-    # Reject malformed identifiers and empty/oversized prompts before touching the filesystem.
     if not is_valid_upload_id(rec_id):
         return "Invalid generation ID.", 400
     if not desc or len(desc) > MAX_TEXT_LENGTH:
         return f"Text must contain 1 to {MAX_TEXT_LENGTH} characters.", 400
+
+    quota_error, quota_status = _check_job_quota(user_id)
+    if quota_error:
+        return jsonify({"error": quota_error}), quota_status
+
+    try:
+        storage = storage_from_env()
+    except StorageConfigurationError:
+        return jsonify({"error": "storage_not_configured"}), 503
+
     try:
         voice_id = (request.form.get("voice_id") or DEFAULT_VOICE_ID).strip()
         voice_speed = parse_bounded_number(request.form.get("voice_speed", "1.0"), 0.5, 2.0, "voice speed")
-        music_volume = int(parse_bounded_number(request.form.get("music_volume", "50"), 0, 100, "music volume"))
         overlay_size = int(parse_bounded_number(request.form.get("overlay_size", "40"), 20, 100, "overlay size"))
     except ValueError as exc:
         return str(exc), 400
-    music_file = request.form.get("music_file", "").strip()
-    overlay_text = (request.form.get("overlay_text") or "")[:300]
-    overlay_position = request.form.get("overlay_position", "bottom")
-    overlay_color = request.form.get("overlay_color", "#ffffff")
-    overlay_font = request.form.get("overlay_font", "Arial")
+
     aspect_ratio = request.form.get("aspect_ratio", "9:16")
     quality = request.form.get("quality", "1080p")
     transition = request.form.get("transition", "none")
     if aspect_ratio not in ALLOWED_ASPECT_RATIOS or quality not in ALLOWED_QUALITIES or transition not in ALLOWED_TRANSITIONS:
         return "Invalid video export option.", 400
-    if overlay_position not in {"top", "center", "bottom"} or overlay_font not in {"Arial", "Helvetica", "Times", "Courier"}:
-        return "Invalid overlay option.", 400
-    if not voice_id or len(voice_id) > 100:
-        return "Invalid voice ID.", 400
-    
-    input_files = []
-    durations = {}
-    
-    upload_dir = os.path.join(app.config["UPLOAD_FOLDER"], rec_id)
-    os.makedirs(upload_dir, exist_ok=False)
-    
-    # Capture the description and save it to a file
-    with open(os.path.join(upload_dir, "desc.txt"), "w", encoding="utf-8") as f:
-        f.write(desc)
-    
-    # Save settings
-    settings = {
-        'voice_id': voice_id,
-        'voice_speed': voice_speed,
-        'music_file': music_file,
-        'music_volume': music_volume,
-        'overlay_text': overlay_text,
-        'overlay_position': overlay_position,
-        'overlay_color': overlay_color,
-        'overlay_font': overlay_font,
-        'overlay_size': overlay_size,
-        'aspect_ratio': aspect_ratio,
-        'quality': quality,
-        'transition': transition
-    }
-    
-    with open(os.path.join(upload_dir, "settings.json"), "w", encoding="utf-8") as f:
-        json.dump(settings, f, indent=2)
-    
-    # Handle file uploads
-    for key, value in request.files.items():
-        if key.startswith('file') and value.filename:
-            file = request.files[key]
-            if not has_allowed_extension(file.filename, ALLOWED_EXTENSIONS):
-                return "Unsupported image type. Use PNG or JPEG files.", 400
-            filename = secure_filename(file.filename)
-            if not filename:
-                return "Invalid upload filename.", 400
-            if filename in {"desc.txt", "settings.json", "input.txt", "audio.mp3"}:
-                filename = f"image_{len(input_files) + 1}.{filename.rsplit('.', 1)[-1].lower()}"
-            target = os.path.join(upload_dir, filename)
-            file.save(target)
-            if not _looks_like_image(target):
-                os.remove(target)
+
+    inputs = []
+    for key, upload in request.files.items():
+        if not key.startswith("file") or not upload.filename:
+            continue
+        if not has_allowed_extension(upload.filename, ALLOWED_EXTENSIONS):
+            return "Unsupported image type. Use PNG or JPEG files.", 400
+        filename = secure_filename(upload.filename)
+        if not filename:
+            return "Invalid upload filename.", 400
+        suffix = Path(filename).suffix.lower()
+        with tempfile.TemporaryDirectory(prefix="vidsnapai-upload-") as temp_dir:
+            temp_path = Path(temp_dir) / ("image" + suffix)
+            upload.save(temp_path)
+            if not _looks_like_image(str(temp_path)):
                 return "Uploaded file content is not a valid supported image.", 400
-            input_files.append(filename)
-            
-            # Get duration if provided
-            duration_key = key.replace('file', 'duration')
-            try:
-                duration = parse_bounded_number(request.form.get(duration_key, "1.0"), 0.25, 30.0, "image duration")
-            except ValueError as exc:
-                return str(exc), 400
-            durations[filename] = duration
-    
-    # Handle custom music upload
-    custom_music = request.files.get('custom_music')
-    if custom_music and custom_music.filename:
-        if not has_allowed_extension(custom_music.filename, ALLOWED_MUSIC_EXTENSIONS):
-            return "Unsupported music type. Use MP3, WAV, M4A, AAC, or OGG.", 400
-        music_filename = secure_filename(custom_music.filename)
-        if not music_filename:
-            return "Invalid music filename.", 400
-        if music_filename in {"desc.txt", "settings.json", "input.txt", "audio.mp3"} or music_filename in input_files:
-            music_filename = f"custom_music.{music_filename.rsplit('.', 1)[-1].lower()}"
-        music_path = os.path.join(upload_dir, music_filename)
-        custom_music.save(music_path)
-        if not _looks_like_audio(music_path):
-            os.remove(music_path)
-            return "Uploaded file content is not a valid supported audio file.", 400
-        settings['music_file'] = music_filename
-        settings['custom_music'] = True
-    
-    # Create input.txt with durations
-    with open(os.path.join(upload_dir, "input.txt"), "w", encoding="utf-8") as f:
-        for fl in input_files:
-            full_path = os.path.abspath(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, fl)).replace('\\', '/')
-            duration = durations.get(fl, 1.0)
-            f.write(f"file '{full_path.replace(chr(39), chr(39) + chr(92) + chr(39) + chr(39))}'\nduration {duration}\n")
+            storage_key = f"inputs/{user_id}/{rec_id}/{len(inputs):02d}{suffix}"
+            storage.put_file(storage_key, str(temp_path))
+        duration_key = key.replace("file", "duration")
+        try:
+            duration = parse_bounded_number(request.form.get(duration_key, "1.0"), 0.25, 30.0, "image duration")
+        except ValueError as exc:
+            return str(exc), 400
+        inputs.append({"key": storage_key, "filename": filename, "duration": duration})
 
-    # Generate audio and reel synchronously
+    if not inputs:
+        return "At least one image is required.", 400
+
+    settings = {
+        "voice_id": voice_id,
+        "voice_speed": voice_speed,
+        "music_volume": int(parse_bounded_number(request.form.get("music_volume", "50"), 0, 100, "music volume")),
+        "overlay_text": (request.form.get("overlay_text") or "")[:300],
+        "overlay_position": request.form.get("overlay_position", "bottom"),
+        "overlay_color": request.form.get("overlay_color", "#ffffff"),
+        "overlay_font": request.form.get("overlay_font", "Arial"),
+        "overlay_size": overlay_size,
+        "aspect_ratio": aspect_ratio,
+        "quality": quality,
+        "transition": transition,
+    }
     try:
-        # Import here to avoid circular imports
-        from text_to_audio import text_to_speech_file
-        text_to_speech_file(desc, rec_id, voice_id=voice_id, speed=voice_speed)
-        from generate_process import create_reel
-        create_reel(rec_id, settings=settings)
-        
-        # Save metadata to database
-        new_reel = Reel(
-            id=rec_id,
-            text=desc,
-            voice_id=voice_id,
-            music_file=settings.get('music_file', ''),
-            settings=json.dumps(settings)
-        )
-        db.session.add(new_reel)
-        db.session.commit()
-        
-        success = True
-        reel_filename = f"{rec_id}.mp4"
-        error_message = None
+        job, _ = enqueue_job(VideoJob, user_id,
+            {"text": desc, "inputs": inputs, "settings": settings})
     except Exception:
-        logger.exception("Reel generation failed for request %s", rec_id)
-        success = False
-        reel_filename = None
-        error_message = "Video generation failed. Check server logs and configuration, then try again."
-    return render_template("create.html", myid=myid, success=success, reel_filename=reel_filename, error_message=error_message)
-
-
+        db.session.rollback()
+        logger.exception("Failed to enqueue local create job")
+        return jsonify({"error": "job_submission_failed"}), 500
+    return jsonify({"job_id": job.id, "status": job.status}), 202
 @app.route("/gallery")
 def gallery():
     reels_dir = str(REELS_FOLDER)
@@ -408,6 +464,8 @@ def features():
 
 @app.route("/api/preview-audio", methods=["POST"])
 def preview_audio():
+    if not _request_user_id():
+        return jsonify({"error": "authentication_required"}), 401
     if VERCEL_RUNTIME:
         return jsonify({"error": "Audio preview requires the separate media worker and is disabled on Vercel serverless."}), 503
     try:
@@ -466,6 +524,8 @@ def share_reel(reel_id):
 
 @app.route("/api/delete/<reel_id>", methods=["POST"])
 def delete_reel(reel_id):
+    if not _request_user_id():
+        return jsonify({"error": "authentication_required"}), 401
     try:
         if not is_valid_upload_id(reel_id):
             return jsonify({"error": "Invalid reel ID"}), 400

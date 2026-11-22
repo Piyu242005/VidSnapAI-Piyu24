@@ -113,38 +113,4 @@ def create_reel(folder, settings=None, upload_root=None, reels_root=None):
 
 
 if __name__ == '__main__':
-    import time
-    print("VidSnapAI Premium Background Processor Started...")
-
-    while True:
-        try:
-            upload_root = os.getenv("UPLOAD_ROOT", "user_uploads")
-            if not os.path.exists(upload_root):
-                os.makedirs(upload_root, exist_ok=True)
-
-            folders = [f for f in os.listdir(upload_root) if os.path.isdir(os.path.join(upload_root, f))]
-            for folder in folders:
-                if folder.startswith('temp_'):
-                    continue
-
-                output_file = os.path.join(os.getenv("REELS_ROOT", "static/reels"), f"{folder}.mp4")
-                if not os.path.exists(output_file):
-                    desc_file = os.path.join(upload_root, folder, "desc.txt")
-                    input_file = os.path.join(upload_root, folder, "input.txt")
-
-                    if os.path.exists(desc_file) and os.path.exists(input_file):
-                        print(f"Processing new folder: {folder}")
-                        try:
-                            audio_file = os.path.join(upload_root, folder, "audio.mp3")
-                            if not os.path.exists(audio_file):
-                                text_to_audio(folder, upload_root=upload_root)
-
-                            create_reel(folder, upload_root=upload_root, reels_root=os.getenv("REELS_ROOT", "static/reels"))
-                            print(f"Successfully processed: {folder}")
-                        except Exception as e:
-                            print(f"Error processing {folder}: {e}")
-
-            time.sleep(5)
-        except Exception as e:
-            print(f"Loop error: {e}")
-            time.sleep(10)
+    print("Deprecated: run 'python worker.py' for database-backed async generation.")
