@@ -58,6 +58,24 @@
                     <li class="nav-item">
                         <a class="nav-link nav-link-premium" href="/about">About</a>
                     </li>
+                    {% if current_user %}
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-premium" href="/dashboard"><i class="fas fa-circle-user me-1"></i>{{ current_user.username }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/logout" method="post" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="nav-link nav-link-premium btn btn-link">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-premium" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-premium" href="/register">Sign up</a>
+                    </li>
+                    {% endif %}
                     <!-- Theme toggle -->
                     <li class="nav-item ms-lg-2">
                         <button class="btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">

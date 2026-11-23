@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, g, session
+from flask import Flask, render_template, request, jsonify, send_file, g, session, redirect, url_for, flash
 import uuid
 from werkzeug.utils import secure_filename
 import os
@@ -10,6 +10,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from werkzeug.security import check_password_hash, generate_password_hash
 from security_utils import has_allowed_extension, is_valid_upload_id, parse_bounded_number
 from production.jobs import create_job_model, enqueue_job, init_jobs
 from production.storage import storage_from_env, StorageConfigurationError
@@ -134,6 +135,30 @@ class Reel(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+@app.context_processor
+def inject_current_user():
+    user_id = session.get("user_id")
+    user = db.session.get(User, user_id) if user_id else None
+    return {"current_user": user}
+
+with app.app_context():
+    db.create_all()
+
 # Schema changes are applied by a controlled migration command, not app import.
 
 # Helper for old metadata structure mapping
@@ -150,6 +175,74 @@ def update_reel_stats(reel_id, stat_type='view'):
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if session.get("user_id"):
+        return redirect(url_for("dashboard"))
+    error = None
+    if request.method == "POST":
+        email = (request.form.get("email") or "").strip().lower()
+        password = request.form.get("password") or ""
+        user = User.query.filter_by(email=email).first()
+        if not user or not user.check_password(password):
+            error = "Invalid email or password."
+        else:
+            session.clear()
+            session["user_id"] = user.id
+            return redirect(url_for("dashboard"))
+    return render_template("login.html", error=error)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if session.get("user_id"):
+        return redirect(url_for("dashboard"))
+    error = None
+    if request.method == "POST":
+        username = (request.form.get("username") or "").strip()
+        email = (request.form.get("email") or "").strip().lower()
+        password = request.form.get("password") or ""
+        if len(username) < 3 or len(username) > 80:
+            error = "Username must be between 3 and 80 characters."
+        elif len(email) > 120 or "@" not in email:
+            error = "Enter a valid email address."
+        elif len(password) < 8:
+            error = "Password must be at least 8 characters."
+        elif User.query.filter_by(email=email).first():
+            error = "An account already exists with this email."
+        elif User.query.filter_by(username=username).first():
+            error = "That username is already in use."
+        else:
+            user = User(username=username, email=email)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+            session.clear()
+            session["user_id"] = user.id
+            return redirect(url_for("dashboard"))
+    return render_template("register.html", error=error)
+
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    session.clear()
+    return redirect(url_for("home"))
+
+
+@app.route("/dashboard")
+def dashboard():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login", next=request.path))
+    user = db.session.get(User, user_id)
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+    jobs = VideoJob.query.filter_by(user_id=str(user.id)).order_by(VideoJob.created_at.desc()).all()
+    processing_jobs = [job for job in jobs if job.status in {"queued", "running"}]
+    return render_template("dashboard.html", jobs=jobs, processing_jobs=processing_jobs)
 
 @app.route("/create", methods=["GET", "POST"])
 def create():
@@ -395,8 +488,16 @@ def gallery():
     # Sort file list to match database order
     reels.sort(key=lambda x: metadata.get(x.replace('.mp4', ''), {}).get('created_at', ''), reverse=True)
     
+    processing_jobs = []
+    user_id = session.get("user_id")
+    if user_id:
+        processing_jobs = VideoJob.query.filter(
+            VideoJob.user_id == str(user_id),
+            VideoJob.status.in_(["queued", "running"])
+        ).order_by(VideoJob.created_at.desc()).all()
+
     logger.info("Gallery loaded %d reel files", len(reels))
-    return render_template("gallery.html", reels=reels, metadata=metadata)
+    return render_template("gallery.html", reels=reels, metadata=metadata, processing_jobs=processing_jobs)
 
 @app.route("/about")
 def about():

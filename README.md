@@ -96,6 +96,10 @@ The deployed web preview is available at [vid-snap-ai-piyu24.vercel.app](https:/
 - Upload checks include extension and basic file-content validation, plus request and field limits. They are not a substitute for sandboxed media decoding, malware scanning, authentication/authorization, CSRF protection, per-user quotas, and resource limits.
 - Generation still has synchronous work in the web request path. Use a durable queue/worker design before accepting untrusted public traffic.
 
+## 🔑 Web account routes
+
+The app includes `/register`, `/login`, `/logout`, and `/dashboard`. Accounts are stored with Werkzeug password hashes, and the dashboard shows the signed-in user's queued, running, and completed video jobs.
+
 ## 🚧 Production-readiness status
 
 This repository is an active project, not a certified or audited production service. Authentication and authorization, rate limiting, durable background jobs, concurrency/load testing, secure media sandboxing, monitoring, and deployment-specific hardening still require implementation and verification. Flask-WTF CSRF protection and same-origin checks are present, but they do not replace authentication or the other controls listed above. Do not use it to process sensitive uploads or expose it publicly without completing those controls.

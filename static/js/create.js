@@ -178,6 +178,14 @@ function initFormSubmission() {
             progressTracker.show();
             progressTracker.updateProgress(10, 'Uploading files...');
         }
+        const submitBtn = document.getElementById('submitBtn');
+        const statusPanel = document.getElementById('createStatusPanel');
+        const statusText = document.getElementById('createStatusText');
+        const statusBar = document.getElementById('createStatusBar');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Reel...'; }
+        if (statusPanel) statusPanel.classList.remove('d-none');
+        if (statusText) statusText.textContent = 'Uploading…';
+        if (statusBar) statusBar.style.width = '10%';
 
         // Create FormData
         const formData = new FormData(form);
@@ -225,12 +233,15 @@ function initFormSubmission() {
             if (progressTracker) {
                 const currentProgress = parseInt(progressTracker.overlay.querySelector('#progressFill').style.width) || 10;
                 if (currentProgress < 90) {
+                    const stage = currentProgress < 30 ? 'Generating voice…' : currentProgress < 60 ? 'Rendering…' : 'Finishing…';
                     progressTracker.updateProgress(
                         currentProgress + 10,
-                        currentProgress < 30 ? 'Generating audio...' :
-                        currentProgress < 60 ? 'Processing images...' :
-                        'Creating video...'
+                        stage
                     );
+                    const statusText = document.getElementById('createStatusText');
+                    const statusBar = document.getElementById('createStatusBar');
+                    if (statusText) statusText.textContent = stage;
+                    if (statusBar) statusBar.style.width = Math.min(currentProgress + 10, 90) + '%';
                 }
             }
         }, 1000);
@@ -264,6 +275,10 @@ function initFormSubmission() {
             if (progressTracker) {
                 progressTracker.hide();
             }
+            const submitBtn = document.getElementById('submitBtn');
+            const statusPanel = document.getElementById('createStatusPanel');
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-magic"></i> Create Reel'; }
+            if (statusPanel) statusPanel.classList.add('d-none');
             if (window.notifications) {
                 window.notifications.error('Failed to create reel. Please try again.');
             }
@@ -363,4 +378,3 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.head.insertAdjacentHTML('beforeend', progressStyles);
 });
-

@@ -19,6 +19,14 @@ class JobApiSecurityTests(unittest.TestCase):
         response = self.client.get("/api/v1/jobs/00000000-0000-0000-0000-000000000000/download")
         self.assertEqual(response.status_code, 401)
 
+    def test_auth_and_dashboard_pages_are_available(self):
+        login = self.client.get("/login")
+        register = self.client.get("/register")
+        dashboard = self.client.get("/dashboard")
+        self.assertEqual(login.status_code, 200)
+        self.assertEqual(register.status_code, 200)
+        self.assertEqual(dashboard.status_code, 302)
+
 
 if __name__ == "__main__":
     unittest.main()
